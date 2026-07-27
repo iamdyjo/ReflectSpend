@@ -829,7 +829,7 @@
     </nav>
 
     <!-- Modal Form (Tambah Transaksi) -->
-    <div class="modal-overlay" id="tx-modal">
+    <div class="modal-overlay" id="tx-modal" onclick="if(event.target === this) closeModal()">
       <div class="modal-sheet">
         <div class="modal-header">
           <div class="modal-title">Tambah Transaksi</div>
@@ -906,7 +906,7 @@
           <button type="submit" class="btn-primary" style="margin-top:24px;">Simpan Transaksi</button>
         </form>
     <!-- Modal Profil & Reset Data -->
-    <div class="modal-overlay" id="profile-modal">
+    <div class="modal-overlay" id="profile-modal" onclick="if(event.target === this) closeProfileModal()">
       <div class="modal-sheet">
         <div class="modal-header">
           <div class="modal-title">Akun & Pengaturan</div>
@@ -1166,9 +1166,10 @@
       });
 
       document.getElementById(`tab-${tabId}`).classList.add('active');
-      if (event && event.currentTarget) {
-        event.currentTarget.classList.add('active');
-        event.currentTarget.setAttribute('aria-selected', 'true');
+      const evt = window.event;
+      if (evt && evt.currentTarget) {
+        evt.currentTarget.classList.add('active');
+        evt.currentTarget.setAttribute('aria-selected', 'true');
       }
     }
 
@@ -1223,10 +1224,11 @@
     // Form Controls
     function setJenis(jenis) {
       currentJenis = jenis;
-      if (event && event.currentTarget) {
-        const btns = event.currentTarget.parentElement.querySelectorAll('.segment-btn');
+      const evt = window.event;
+      if (evt && evt.currentTarget) {
+        const btns = evt.currentTarget.parentElement.querySelectorAll('.segment-btn');
         btns.forEach(b => b.classList.remove('active'));
-        event.currentTarget.classList.add('active');
+        evt.currentTarget.classList.add('active');
       }
 
       const emosiSection = document.getElementById('section-emosi');
@@ -1359,9 +1361,11 @@
     }
 
     function handleLogin(e) {
-      e.preventDefault();
-      const name = document.getElementById('login-name').value.trim();
-      const email = document.getElementById('login-email').value.trim();
+      if (e) e.preventDefault();
+      const nameInput = document.getElementById('login-name');
+      const emailInput = document.getElementById('login-email');
+      const name = nameInput ? nameInput.value.trim() : '';
+      const email = emailInput ? emailInput.value.trim() : '';
 
       if (name) {
         userProfile = { name, email };
@@ -1369,6 +1373,8 @@
         renderProfileContent();
         closeProfileModal();
         alert(`Selamat datang, ${name}! Profil kamu tersimpan.`);
+      } else {
+        alert('Silakan masukkan Nama Pengguna terlebih dahulu.');
       }
     }
 
