@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReflectSpend — Pencatatan Keuangan & Refleksi Emosi</title>
+  <meta name="description" content="ReflectSpend membantu mencatat transaksi finansial dan memahami pemicu emosional di balik setiap pengeluaran.">
+  
+  <!-- Inter Font from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- ReflectSpend Design Tokens -->
+  <link rel="stylesheet" href="assets/design-tokens.css">
+
+  <style>
+    /* CSS Rest & Layout Base */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--rs-font-family);
+      background-color: var(--rs-bg-secondary);
+      color: var(--rs-text-primary);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* Container Max 640px (Mobile/Tablet Centered) */
+    .app-container {
+      width: 100%;
+      max-width: 640px;
+      background-color: var(--rs-bg-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 0 32px rgba(0, 0, 0, 0.04);
+      padding-bottom: 84px; /* Space for bottom nav */
+    }
+
+    /* Top Bar Header */
+    .app-header {
+      padding: 16px 20px;
+      background-color: var(--rs-bg-primary);
+      border-bottom: var(--rs-border);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--rs-text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-title .brand-accent {
+      color: var(--rs-accent);
+    }
+
+    .header-badge {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 8px;
+      background-color: var(--rs-bg-tertiary);
+      color: var(--rs-text-secondary);
+      border-radius: 12px;
+    }
+
+    /* Tab Content Section */
+    .tab-content {
+      display: none;
+      padding: 20px;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Summary Card Component (C1) */
+    .summary-card {
+      background-color: var(--rs-bg-primary);
+      border: var(--rs-border);
+      border-radius: var(--rs-radius-lg);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .summary-card .label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--rs-text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .summary-card .amount {
+      font-size: var(--rs-font-display);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .summary-card .amount.expense {
+      color: var(--rs-expense);
+    }
+
+    .summary-card .amount.income {
+      color: var(--rs-income);
+    }
+
+    .summary-card .subtext {
+      font-size: var(--rs-font-footnote);
+      color: var(--rs-text-secondary);
+    }
+
+    /* Dual Stat Grid */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background-color: var(--rs-bg-secondary);
+      border: var(--rs-border);
+      border-radius: var(--rs-radius-md);
+      padding: 14px;
+    }
+
+    .stat-card .stat-label {
+      font-size: 12px;
+      color: var(--rs-text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .stat-card .stat-value {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    /* Section Header */
+    .section-title {
+      font-size: var(--rs-font-title2);
+      font-weight: 600;
+      margin: 20px 0 12px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .section-title-sm {
+      font-size: var(--rs-font-headline);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    /* Transaction List Item (C2) */
+    .transaction-group {
+      margin-bottom: 20px;
+    }
+
+    .group-header {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--rs-text-secondary);
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--rs-bg-tertiary);
+    }
+
+    .transaction-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: var(--rs-border);
+      gap: 12px;
+    }
+
+    .transaction-item:last-child {
+      border-bottom: none;
+    }
+
+    .icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--rs-bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--rs-text-primary);
+      flex-shrink: 0;
+    }
+
+    .tx-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .tx-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--rs-text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tx-meta {
+      font-size: 13px;
+      color: var(--rs-text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .tx-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .tx-amount {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .tx-amount.expense { color: var(--rs-expense); }
+    .tx-amount.income { color: var(--rs-income); }
+    .tx-amount.transfer { color: var(--rs-transfer); }
+
+    .tag-impulsive {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--rs-warning);
+      background-color: rgba(255, 149, 0, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 2px;
+    }
+
+    /* Insight Banner Card (C6) */
+    .insight-card {
+      background-color: var(--rs-bg-secondary);
+      border: var(--rs-border);
+      border-radius: var(--rs-radius-lg);
+      padding: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .insight-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background-color: rgba(0, 122, 255, 0.1);
+      color: var(--rs-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .insight-body h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .insight-body p {
+      font-size: 13px;
+      color: var(--rs-text-secondary);
+      line-height: 1.4;
+    }
+
+    /* Buttons (C5) */
+    .btn-primary {
+      width: 100%;
+      height: 50px;
+      background-color: var(--rs-accent);
+      color: #FFFFFF;
+      border: none;
+      border-radius: var(--rs-radius-md);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.15s ease;
+    }
+
+    .btn-primary:active {
+      opacity: 0.85;
+    }
+
+    .btn-secondary {
+      height: 44px;
+      background-color: var(--rs-bg-secondary);
+      color: var(--rs-text-primary);
+      border: var(--rs-border);
+      border-radius: var(--rs-radius-md);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 0 16px;
+      cursor: pointer;
+    }
+
+    /* Bottom Navigation Bar & FAB */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 640px;
+      height: 64px;
+      background-color: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      border-top: var(--rs-border);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      align-items: center;
+      z-index: 30;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: var(--rs-text-secondary);
+      font-size: 11px;
+      font-weight: 500;
+      text-decoration: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      height: 100%;
+    }
+
+    .nav-item.active {
+      color: var(--rs-accent);
+    }
+
+    .nav-item i {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Floating Action Button (FAB) */
+    .fab-btn {
+      position: fixed;
+      bottom: 76px;
+      right: calc(50% - 300px + 20px);
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: var(--rs-accent);
+      color: #FFFFFF;
+      border: none;
+      box-shadow: 0 4px 14px rgba(0, 122, 255, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 40;
+      transition: transform 0.15s ease;
+    }
+
+    @media (max-width: 640px) {
+      .fab-btn {
+        right: 20px;
+      }
+    }
+
+    .fab-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* Modal Form Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 640px;
+      max-height: 90vh;
+      background-color: var(--rs-bg-primary);
+      border-top-left-radius: var(--rs-radius-sheet);
+      border-top-right-radius: var(--rs-radius-sheet);
+      padding: 24px 20px 32px 20px;
+      overflow-y: auto;
+      animation: slideUp 0.25s cubic-bezier(0.1, 0.9, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      color: var(--rs-text-secondary);
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--rs-text-primary);
+    }
+
+    .form-control {
+      width: 100%;
+      height: 46px;
+      padding: 0 14px;
+      border: var(--rs-border);
+      border-radius: var(--rs-radius-md);
+      font-size: 16px;
+      background-color: var(--rs-bg-primary);
+      font-family: inherit;
+      color: var(--rs-text-primary);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--rs-border-focus);
+    }
+
+    /* Segmented Control (Choice Chips C3) */
+    .segmented-control {
+      display: flex;
+      background-color: var(--rs-bg-tertiary);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .segment-btn {
+      flex: 1;
+      height: 36px;
+      border: none;
+      background: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--rs-text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .segment-btn.active {
+      background-color: #FFFFFF;
+      color: var(--rs-text-primary);
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* Choice Chips Grid */
+    .chips-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      height: 38px;
+      padding: 0 14px;
+      border-radius: var(--rs-radius-sm);
+      border: var(--rs-border);
+      background-color: var(--rs-bg-primary);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--rs-text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .chip.active {
+      background-color: rgba(0, 122, 255, 0.08);
+      border-color: var(--rs-accent);
+      color: var(--rs-text-primary);
+      font-weight: 600;
+    }
+
+    /* Slider (C4) */
+    .scale-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .scale-value-badge {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--rs-accent);
+    }
+
+    .range-slider {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--rs-bg-tertiary);
+      accent-color: var(--rs-accent);
+      cursor: pointer;
+    }
+
+    .scale-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--rs-text-secondary);
+      margin-top: 6px;
+    }
+
+    /* Chart horizontal bars */
+    .bar-item {
+      margin-bottom: 12px;
+    }
+
+    .bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .bar-track {
+      height: 10px;
+      background-color: var(--rs-bg-tertiary);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 5px;
+      transition: width 0.4s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- App Header -->
+    <header class="app-header">
+      <div class="brand-title">
+        <i data-lucide="wallet" class="brand-accent"></i>
+        <span>Reflect<span class="brand-accent">Spend</span></span>
+      </div>
+      <span class="header-badge">Glide + Sheets</span>
+    </header>
+
+    <!-- FAB Button -->
+    <button class="fab-btn" onclick="openModal()" aria-label="Tambah Transaksi Baru">
+      <i data-lucide="plus" style="width:28px; height:28px;"></i>
+    </button>
+
+    <!-- Tab 1: Beranda -->
+    <main id="tab-beranda" class="tab-content active">
+      
+      <!-- Summary Card (C1) -->
+      <div class="summary-card">
+        <div class="label">Pengeluaran Bulan Ini</div>
+        <div class="amount expense rs-tabular-nums">Rp 2.850.000</div>
+        <div class="subtext">↑ 12% dari bulan lalu (netral)</div>
+      </div>
+
+      <!-- Stat Grid -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-label">Saldo Bulan Ini</div>
+          <div class="stat-value rs-tabular-nums" style="color:var(--rs-income)">+Rp 3.150.000</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Transaksi Impulsif</div>
+          <div class="stat-value rs-tabular-nums" style="color:var(--rs-warning)">30% (6 tx)</div>
+        </div>
+      </div>
+
+      <!-- Insight Card (C6) -->
+      <div class="insight-card">
+        <div class="insight-icon">
+          <i data-lucide="brain"></i>
+        </div>
+        <div class="insight-body">
+          <h4>Insight Emosi Utama</h4>
+          <p>40% pengeluaranmu bulan ini terjadi saat kamu merasa <strong>Stres</strong>. Rata-rata transaksi saat stres Rp 95.000.</p>
+        </div>
+      </div>
+
+      <!-- Recent Transactions -->
+      <div class="section-title">
+        <span>Transaksi Terakhir</span>
+        <button class="btn-secondary" style="height:32px; font-size:12px; padding:0 10px;" onclick="switchTab('riwayat')">Lihat Semua</button>
+      </div>
+
+      <div class="transaction-group" id="recent-list">
+        <!-- Dynamic JS List Items -->
+      </div>
+    </main>
+
+    <!-- Tab 2: Riwayat -->
+    <section id="tab-riwayat" class="tab-content">
+      <div class="section-title-sm">Riwayat & Filter</div>
+      
+      <div class="form-group" style="margin-bottom:12px;">
+        <input type="text" class="form-control" placeholder="Cari transaksi atau jurnal..." onkeyup="filterHistory(this.value)">
+      </div>
+
+      <div class="chips-grid" style="margin-bottom:16px;">
+        <div class="chip active">Semua</div>
+        <div class="chip">🔴 Stres</div>
+        <div class="chip">🟡 Senang</div>
+        <div class="chip">Tidak Direncanakan</div>
+      </div>
+
+      <div id="full-history-list">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- Tab 3: Insight -->
+    <section id="tab-insight" class="tab-content">
+      <div class="section-title-sm">Analisis Pola Emosi</div>
+      
+      <div class="insight-card" style="background:#FFFFFF; border:var(--rs-border);">
+        <div class="insight-icon" style="background:rgba(52, 199, 89, 0.1); color:var(--rs-income);">
+          <i data-lucide="sparkles"></i>
+        </div>
+        <div class="insight-body">
+          <h4>Threshold Metrik Terpenuhi</h4>
+          <p>Tersimpan 24 transaksi pengeluaran ber-emosi. Pola belanja terdeteksi presisi.</p>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="label">Pengeluaran Berdasarkan Emosi</div>
+        <div style="margin-top:14px;">
+          <div class="bar-item">
+            <div class="bar-label">
+              <span>🔴 Stres (8 tx)</span>
+              <span class="rs-tabular-nums">Rp 1.140.000</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width:40%; background:var(--rs-red);"></div></div>
+          </div>
+
+          <div class="bar-item">
+            <div class="bar-label">
+              <span>⚪ Bosan (6 tx)</span>
+              <span class="rs-tabular-nums">Rp 712.500</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width:25%; background:var(--rs-gray);"></div></div>
+          </div>
+
+          <div class="bar-item">
+            <div class="bar-label">
+              <span>🟡 Senang (5 tx)</span>
+              <span class="rs-tabular-nums">Rp 570.000</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width:20%; background:var(--rs-amber);"></div></div>
+          </div>
+
+          <div class="bar-item">
+            <div class="bar-label">
+              <span>🟠 Cemas (3 tx)</span>
+              <span class="rs-tabular-nums">Rp 285.000</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width:10%; background:var(--rs-orange);"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 4: Refleksi -->
+    <section id="tab-refleksi" class="tab-content">
+      <div class="section-title-sm">Refleksi Mingguan (2026-W30)</div>
+
+      <div class="summary-card" style="margin-bottom:16px;">
+        <div class="label" style="color:var(--rs-accent)">Pertanyaan 1 dari 6</div>
+        <h3 style="font-size:16px; font-weight:600; margin:6px 0;">Pengeluaran apa yang paling berpengaruh minggu ini?</h3>
+        <textarea class="form-control" style="height:90px; padding:10px; margin-top:10px;" placeholder="Tuliskan refleksi singkatmu..."></textarea>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="btn-secondary" style="flex:1;">Lewati</button>
+        <button class="btn-primary" style="flex:2;" onclick="alert('Refleksi tersimpan ke sheet Weekly_Reflections!')">Simpan & Lanjut</button>
+      </div>
+    </section>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="switchTab('beranda')">
+        <i data-lucide="house"></i>
+        <span>Beranda</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('riwayat')">
+        <i data-lucide="list-bullet"></i>
+        <span>Riwayat</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('insight')">
+        <i data-lucide="bar-chart-3"></i>
+        <span>Insight</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('refleksi')">
+        <i data-lucide="book-open"></i>
+        <span>Refleksi</span>
+      </button>
+    </nav>
+
+    <!-- Modal Form (Tambah Transaksi) -->
+    <div class="modal-overlay" id="tx-modal">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <div class="modal-title">Tambah Transaksi</div>
+          <button class="btn-close" onclick="closeModal()"><i data-lucide="x"></i></button>
+        </div>
+
+        <form id="tx-form" onsubmit="handleSaveTx(event)">
+          
+          <!-- Jenis Segmented Control -->
+          <div class="form-group">
+            <label class="form-label">Jenis Transaksi</label>
+            <div class="segmented-control">
+              <button type="button" class="segment-btn active" onclick="setJenis('Pengeluaran')">Pengeluaran</button>
+              <button type="button" class="segment-btn" onclick="setJenis('Pemasukan')">Pemasukan</button>
+              <button type="button" class="segment-btn" onclick="setJenis('Transfer')">Transfer</button>
+            </div>
+          </div>
+
+          <!-- Nominal -->
+          <div class="form-group">
+            <label class="form-label">Nominal (Rp)</label>
+            <input type="number" id="tx-nominal" class="form-control rs-tabular-nums" placeholder="0" required min="1">
+          </div>
+
+          <!-- Kategori & Metode -->
+          <div class="form-group">
+            <label class="form-label">Kategori</label>
+            <select id="tx-kategori" class="form-control">
+              <option value="Makanan & Minuman">🍴 Makanan & Minuman</option>
+              <option value="Transport">🚗 Transport</option>
+              <option value="Belanja">🛍️ Belanja</option>
+              <option value="Hiburan">🎬 Hiburan</option>
+              <option value="Tagihan & Langganan">📄 Tagihan & Langganan</option>
+            </select>
+          </div>
+
+          <!-- Section Emosi (Khusus Pengeluaran) -->
+          <div id="section-emosi">
+            <div class="form-group">
+              <label class="form-label">Emosi Setelah Transaksi</label>
+              <div class="chips-grid" id="emosi-chips">
+                <div class="chip active" onclick="selectEmosi('Stres', this)"><span class="rs-emotion-dot stres"></span> Stres</div>
+                <div class="chip" onclick="selectEmosi('Bosan', this)"><span class="rs-emotion-dot bosan"></span> Bosan</div>
+                <div class="chip" onclick="selectEmosi('Senang', this)"><span class="rs-emotion-dot senang"></span> Senang</div>
+                <div class="chip" onclick="selectEmosi('Puas', this)"><span class="rs-emotion-dot puas"></span> Puas</div>
+                <div class="chip" onclick="selectEmosi('Cemas', this)"><span class="rs-emotion-dot cemas"></span> Cemas</div>
+                <div class="chip" onclick="selectEmosi('Sedih', this)"><span class="rs-emotion-dot sedih"></span> Sedih</div>
+              </div>
+            </div>
+
+            <!-- Slider Scale (C4) -->
+            <div class="form-group">
+              <div class="scale-header">
+                <label class="form-label" style="margin:0;">Skala Intensitas</label>
+                <span class="scale-value-badge" id="scale-val">8</span>
+              </div>
+              <input type="range" min="1" max="10" value="8" class="range-slider" id="tx-skala" oninput="document.getElementById('scale-val').innerText = this.value">
+              <div class="scale-labels">
+                <span>Ringan (1)</span>
+                <span>Sangat Kuat (10)</span>
+              </div>
+            </div>
+
+            <!-- Intensionalitas -->
+            <div class="form-group">
+              <label class="form-label">Apakah Transaksi ini Direncanakan?</label>
+              <div class="segmented-control">
+                <button type="button" class="segment-btn active" id="btn-plan-ya" onclick="setPlan(true)">Ya (Direncanakan)</button>
+                <button type="button" class="segment-btn" id="btn-plan-tidak" onclick="setPlan(false)">Tidak (Impulsif)</button>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" style="margin-top:24px;">Simpan Transaksi</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Data State
+    let currentJenis = 'Pengeluaran';
+    let selectedEmosi = 'Stres';
+    let isPlanned = true;
+
+    const mockTransactions = [
+      { id: 1, jenis: 'Pengeluaran', nominal: 75000, kategori: 'Makanan & Minuman', icon: 'utensils', emosi: 'Stres', dotClass: 'stres', planned: false, tgl: 'Hari ini' },
+      { id: 2, jenis: 'Pengeluaran', nominal: 120000, kategori: 'Belanja', icon: 'shopping-bag', emosi: 'Bosan', dotClass: 'bosan', planned: false, tgl: 'Hari ini' },
+      { id: 3, jenis: 'Pemasukan', nominal: 4500000, kategori: 'Gaji', icon: 'arrow-down-left', emosi: '', dotClass: '', planned: true, tgl: 'Kemarin' },
+      { id: 4, jenis: 'Pengeluaran', nominal: 45000, kategori: 'Transport', icon: 'car', emosi: 'Puas', dotClass: 'puas', planned: true, tgl: 'Kemarin' }
+    ];
+
+    // Render Transaction Item
+    function renderTxItem(tx) {
+      const isExpense = tx.jenis === 'Pengeluaran';
+      const isIncome = tx.jenis === 'Pemasukan';
+      const amountClass = isExpense ? 'expense' : (isIncome ? 'income' : 'transfer');
+      const sign = isExpense ? '−' : (isIncome ? '+' : '');
+
+      return `
+        <div class="transaction-item">
+          <div class="icon-box"><i data-lucide="${tx.icon}"></i></div>
+          <div class="tx-info">
+            <div class="tx-title">${tx.kategori}</div>
+            <div class="tx-meta">
+              <span>${tx.tgl}</span>
+              ${tx.emosi ? `<span>·</span> <span class="rs-emotion-dot ${tx.dotClass}"></span> <span>${tx.emosi}</span>` : ''}
+            </div>
+            ${!tx.planned ? '<div class="tag-impulsive">Tidak direncanakan</div>' : ''}
+          </div>
+          <div class="tx-right">
+            <div class="tx-amount ${amountClass} rs-tabular-nums">${sign}Rp ${tx.nominal.toLocaleString('id-ID')}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Populate Initial Lists
+    function populateLists() {
+      const recentList = document.getElementById('recent-list');
+      const fullList = document.getElementById('full-history-list');
+
+      recentList.innerHTML = mockTransactions.slice(0, 3).map(renderTxItem).join('');
+      fullList.innerHTML = mockTransactions.map(renderTxItem).join('');
+      lucide.createIcons();
+    }
+
+    populateLists();
+
+    // Tab Navigation
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    // Modal Control
+    function openModal() {
+      document.getElementById('tx-modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('tx-modal').classList.remove('active');
+    }
+
+    // Form Controls
+    function setJenis(jenis) {
+      currentJenis = jenis;
+      const btns = event.currentTarget.parentElement.querySelectorAll('.segment-btn');
+      btns.forEach(b => b.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+
+      const emosiSection = document.getElementById('section-emosi');
+      emosiSection.style.display = (jenis === 'Pengeluaran') ? 'block' : 'none';
+    }
+
+    function selectEmosi(emosi, chipEl) {
+      selectedEmosi = emosi;
+      document.querySelectorAll('#emosi-chips .chip').forEach(c => c.classList.remove('active'));
+      chipEl.classList.add('active');
+    }
+
+    function setPlan(val) {
+      isPlanned = val;
+      document.getElementById('btn-plan-ya').classList.toggle('active', val);
+      document.getElementById('btn-plan-tidak').classList.toggle('active', !val);
+    }
+
+    // Save Handler
+    function handleSaveTx(e) {
+      e.preventDefault();
+      const nominal = parseInt(document.getElementById('tx-nominal').value);
+      const kategori = document.getElementById('tx-kategori').value;
+
+      const newTx = {
+        id: Date.now(),
+        jenis: currentJenis,
+        nominal: nominal,
+        kategori: kategori,
+        icon: 'credit-card',
+        emosi: currentJenis === 'Pengeluaran' ? selectedEmosi : '',
+        dotClass: selectedEmosi.toLowerCase(),
+        planned: isPlanned,
+        tgl: 'Hari ini'
+      };
+
+      mockTransactions.unshift(newTx);
+      populateLists();
+      closeModal();
+      alert(`Transaksi tersimpan! Pengeluaran Rp ${nominal.toLocaleString('id-ID')} dengan emosi ${selectedEmosi}.`);
+    }
+  </script>
+</body>
+</html>
