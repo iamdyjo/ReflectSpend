@@ -389,11 +389,21 @@
 
     .nav-item.active {
       color: var(--rs-accent);
+      font-weight: 600;
     }
 
-    .nav-item i {
+    .nav-item svg {
       width: 20px;
       height: 20px;
+      stroke: currentColor;
+      fill: none;
+      flex-shrink: 0;
+      transition: stroke 0.15s ease, color 0.15s ease;
+    }
+
+    .nav-item.active svg {
+      stroke: var(--rs-accent);
+      color: var(--rs-accent);
     }
 
     /* Floating Action Button (FAB) */
@@ -566,7 +576,7 @@
     .chip.active {
       background-color: rgba(0, 122, 255, 0.08);
       border-color: var(--rs-accent);
-      color: var(--rs-text-primary);
+      color: var(--rs-accent);
       font-weight: 600;
     }
 
