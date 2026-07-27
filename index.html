@@ -697,11 +697,17 @@
         <input type="text" class="form-control" placeholder="Cari transaksi atau jurnal..." onkeyup="filterHistory(this.value)">
       </div>
 
-      <div class="chips-grid" style="margin-bottom:16px;">
-        <div class="chip active">Semua</div>
-        <div class="chip">🔴 Stres</div>
-        <div class="chip">🟡 Senang</div>
-        <div class="chip">Tidak Direncanakan</div>
+      <div class="chips-grid" id="history-filter-chips" style="margin-bottom:16px;">
+        <div class="chip active" onclick="setFilterChip('Semua', this)">Semua</div>
+        <div class="chip" onclick="setFilterChip('Stres', this)"><span class="rs-emotion-dot stres"></span> Stres</div>
+        <div class="chip" onclick="setFilterChip('Bosan', this)"><span class="rs-emotion-dot bosan"></span> Bosan</div>
+        <div class="chip" onclick="setFilterChip('Senang', this)"><span class="rs-emotion-dot senang"></span> Senang</div>
+        <div class="chip" onclick="setFilterChip('Puas', this)"><span class="rs-emotion-dot puas"></span> Puas</div>
+        <div class="chip" onclick="setFilterChip('Cemas', this)"><span class="rs-emotion-dot cemas"></span> Cemas</div>
+        <div class="chip" onclick="setFilterChip('Sedih', this)"><span class="rs-emotion-dot sedih"></span> Sedih</div>
+        <div class="chip" onclick="setFilterChip('Impulsif', this)">⚡ Impulsif</div>
+        <div class="chip" onclick="setFilterChip('Pengeluaran', this)">💸 Pengeluaran</div>
+        <div class="chip" onclick="setFilterChip('Pemasukan', this)">💰 Pemasukan</div>
       </div>
 
       <div id="full-history-list">
@@ -930,14 +936,58 @@
       `;
     }
 
+    // Filter & Search State
+    let currentFilterChip = 'Semua';
+    let currentSearchQuery = '';
+
+    function setFilterChip(filterVal, chipEl) {
+      currentFilterChip = filterVal;
+      document.querySelectorAll('#history-filter-chips .chip').forEach(c => c.classList.remove('active'));
+      chipEl.classList.add('active');
+      applyFilters();
+    }
+
+    function filterHistory(queryVal) {
+      currentSearchQuery = queryVal.toLowerCase().trim();
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const filtered = mockTransactions.filter(tx => {
+        // 1. Search Query Filter
+        const matchesSearch = !currentSearchQuery || 
+          (tx.kategori && tx.kategori.toLowerCase().includes(currentSearchQuery)) ||
+          (tx.emosi && tx.emosi.toLowerCase().includes(currentSearchQuery)) ||
+          (tx.jenis && tx.jenis.toLowerCase().includes(currentSearchQuery)) ||
+          (tx.tgl && tx.tgl.toLowerCase().includes(currentSearchQuery)) ||
+          (tx.nominal && tx.nominal.toString().includes(currentSearchQuery));
+
+        if (!matchesSearch) return false;
+
+        // 2. Filter Chip Selection
+        if (currentFilterChip === 'Semua') return true;
+        if (currentFilterChip === 'Impulsif') return !tx.planned;
+        if (currentFilterChip === 'Pengeluaran') return tx.jenis === 'Pengeluaran';
+        if (currentFilterChip === 'Pemasukan') return tx.jenis === 'Pemasukan';
+        
+        // Emotion Chip Filters (Stres, Bosan, Senang, Puas, Cemas, Sedih)
+        return tx.emosi === currentFilterChip;
+      });
+
+      const fullList = document.getElementById('full-history-list');
+      if (filtered.length === 0) {
+        fullList.innerHTML = `<div style="text-align:center; padding:32px 16px; color:var(--rs-text-secondary); font-size:14px;">Tidak ada transaksi yang cocok dengan filter "${currentFilterChip}".</div>`;
+      } else {
+        fullList.innerHTML = filtered.map(renderTxItem).join('');
+      }
+      lucide.createIcons();
+    }
+
     // Populate Initial Lists
     function populateLists() {
       const recentList = document.getElementById('recent-list');
-      const fullList = document.getElementById('full-history-list');
-
       recentList.innerHTML = mockTransactions.slice(0, 3).map(renderTxItem).join('');
-      fullList.innerHTML = mockTransactions.map(renderTxItem).join('');
-      lucide.createIcons();
+      applyFilters();
     }
 
     populateLists();
