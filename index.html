@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ReflectSpend — Pencatatan Keuangan & Refleksi Emosi</title>
   <meta name="description" content="ReflectSpend membantu mencatat transaksi finansial dan memahami pemicu emosional di balik setiap pengeluaran.">
+  <meta name="theme-color" content="#007AFF">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
   
   <!-- Inter Font from Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1022,6 +1026,13 @@
       });
 
       alert(`Transaksi tersimpan! ${currentJenis} Rp ${nominal.toLocaleString('id-ID')}${currentJenis === 'Pengeluaran' ? ' (Emosi: ' + selectedEmosi + ')' : ''}.`);
+    }
+
+    // Register Service Worker for PWA Offline Support
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
+      });
     }
   </script>
 </body>
