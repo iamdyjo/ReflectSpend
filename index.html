@@ -866,17 +866,27 @@
     // Initialize Lucide Icons
     lucide.createIcons();
 
+    // Config API Google Apps Script (Isi URL Web App setelah Deploy di Apps Script)
+    const GOOGLE_SCRIPT_URL = "";
+
     // Data State
     let currentJenis = 'Pengeluaran';
     let selectedEmosi = 'Stres';
     let isPlanned = true;
 
-    const mockTransactions = [
+    const initialDefaultTx = [
       { id: 1, jenis: 'Pengeluaran', nominal: 75000, kategori: 'Makanan & Minuman', icon: 'utensils', emosi: 'Stres', dotClass: 'stres', planned: false, tgl: 'Hari ini' },
       { id: 2, jenis: 'Pengeluaran', nominal: 120000, kategori: 'Belanja', icon: 'shopping-bag', emosi: 'Bosan', dotClass: 'bosan', planned: false, tgl: 'Hari ini' },
       { id: 3, jenis: 'Pemasukan', nominal: 4500000, kategori: 'Gaji', icon: 'arrow-down-left', emosi: '', dotClass: '', planned: true, tgl: 'Kemarin' },
       { id: 4, jenis: 'Pengeluaran', nominal: 45000, kategori: 'Transport', icon: 'car', emosi: 'Puas', dotClass: 'puas', planned: true, tgl: 'Kemarin' }
     ];
+
+    // Load from localStorage if available
+    let mockTransactions = JSON.parse(localStorage.getItem('rs_transactions')) || initialDefaultTx;
+
+    function saveToLocalStorage() {
+      localStorage.setItem('rs_transactions', JSON.stringify(mockTransactions));
+    }
 
     // Render Transaction Item
     function renderTxItem(tx) {
@@ -887,17 +897,17 @@
 
       return `
         <div class="transaction-item">
-          <div class="icon-box"><i data-lucide="${tx.icon}"></i></div>
+          <div class="icon-box"><i data-lucide="${tx.icon || 'credit-card'}"></i></div>
           <div class="tx-info">
             <div class="tx-title">${tx.kategori}</div>
             <div class="tx-meta">
-              <span>${tx.tgl}</span>
+              <span>${tx.tgl || 'Hari ini'}</span>
               ${tx.emosi ? `<span>·</span> <span class="rs-emotion-dot ${tx.dotClass}"></span> <span>${tx.emosi}</span>` : ''}
             </div>
             ${!tx.planned ? '<div class="tag-impulsive">Tidak direncanakan</div>' : ''}
           </div>
           <div class="tx-right">
-            <div class="tx-amount ${amountClass} rs-tabular-nums">${sign}Rp ${tx.nominal.toLocaleString('id-ID')}</div>
+            <div class="tx-amount ${amountClass} rs-tabular-nums">${sign}Rp ${parseInt(tx.nominal).toLocaleString('id-ID')}</div>
           </div>
         </div>
       `;
@@ -914,6 +924,26 @@
     }
 
     populateLists();
+
+    // Sync to Google Sheets via Apps Script Web App Endpoint
+    async function syncToGoogleSheets(txData) {
+      if (!GOOGLE_SCRIPT_URL) return;
+
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'add_transaction',
+            ...txData
+          })
+        });
+        console.log('Real-time sync to Google Sheets triggered!');
+      } catch (err) {
+        console.warn('Sync to Google Sheets offline / error:', err);
+      }
+    }
 
     // Tab Navigation
     function switchTab(tabId) {
@@ -957,7 +987,7 @@
     }
 
     // Save Handler
-    function handleSaveTx(e) {
+    async function handleSaveTx(e) {
       e.preventDefault();
       const nominal = parseInt(document.getElementById('tx-nominal').value);
       const kategori = document.getElementById('tx-kategori').value;
@@ -975,9 +1005,23 @@
       };
 
       mockTransactions.unshift(newTx);
+      saveToLocalStorage();
       populateLists();
       closeModal();
-      alert(`Transaksi tersimpan! Pengeluaran Rp ${nominal.toLocaleString('id-ID')} dengan emosi ${selectedEmosi}.`);
+
+      // Trigger sync to Google Sheets API
+      syncToGoogleSheets({
+        tanggal: new Date().toISOString().split('T')[0],
+        jenis: currentJenis,
+        nominal: nominal,
+        kategori: kategori,
+        metode: 'QRIS',
+        emosi: currentJenis === 'Pengeluaran' ? selectedEmosi : '',
+        skala: document.getElementById('tx-skala').value,
+        direncanakan: isPlanned ? 'Ya' : 'Tidak'
+      });
+
+      alert(`Transaksi tersimpan! ${currentJenis} Rp ${nominal.toLocaleString('id-ID')}${currentJenis === 'Pengeluaran' ? ' (Emosi: ' + selectedEmosi + ')' : ''}.`);
     }
   </script>
 </body>
