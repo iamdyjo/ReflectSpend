@@ -941,7 +941,8 @@
     ];
 
     // Load from localStorage if available
-    let mockTransactions = JSON.parse(localStorage.getItem('rs_transactions')) || initialDefaultTx;
+    const savedTx = localStorage.getItem('rs_transactions');
+    let mockTransactions = savedTx !== null ? JSON.parse(savedTx) : initialDefaultTx;
 
     function saveToLocalStorage() {
       localStorage.setItem('rs_transactions', JSON.stringify(mockTransactions));
@@ -1388,7 +1389,7 @@
     function handleResetData() {
       if (confirm('Apakah kamu yakin ingin mereset dan menghapus SELURUH data transaksi & refleksi? Data yang terhapus tidak dapat dikembalikan.')) {
         mockTransactions = [];
-        localStorage.removeItem('rs_transactions');
+        saveToLocalStorage();
         localStorage.removeItem('rs_reflection_answers');
         localStorage.removeItem('rs_reflection_submitted');
         
