@@ -1089,10 +1089,10 @@
         </div>
 
         <div style="display:flex; gap:8px;">
-          <button class="btn-secondary" style="flex:1; padding:0 12px; font-size:13px;" ${currentReflectionStep === 0 ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : 'onclick="prevReflectionStep()"'}>‹ Kembali</button>
-          <button class="btn-secondary" style="flex:1; padding:0 12px; font-size:13px;" onclick="nextReflectionStep(true)">Lewati</button>
-          <button class="btn-primary" style="flex:2; font-size:14px;" onclick="nextReflectionStep(false)">
-            ${currentReflectionStep === 5 ? 'Selesai & Simpan ✨' : 'Simpan & Lanjut ›'}
+          <button class="btn-secondary" style="flex:1; height:42px; padding:0 8px; font-size:13px;" ${currentReflectionStep === 0 ? 'disabled style="opacity:0.4; cursor:not-allowed; height:42px;"' : 'onclick="prevReflectionStep()"'}>‹ Kembali</button>
+          <button class="btn-secondary" style="flex:1; height:42px; padding:0 8px; font-size:13px;" onclick="nextReflectionStep(true)">Lewati</button>
+          <button class="btn-primary" style="flex:1.2; height:42px; padding:0 8px; font-size:13px; font-weight:600;" onclick="nextReflectionStep(false)">
+            ${currentReflectionStep === 5 ? 'Selesai ✨' : 'Lanjut ›'}
           </button>
         </div>
       `;
