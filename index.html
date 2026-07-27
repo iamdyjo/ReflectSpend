@@ -688,19 +688,19 @@
       <!-- Summary Card (C1) -->
       <div class="summary-card">
         <div class="label">Pengeluaran Bulan Ini</div>
-        <div class="amount expense rs-tabular-nums">Rp 2.850.000</div>
-        <div class="subtext">↑ 12% dari bulan lalu (netral)</div>
+        <div class="amount expense rs-tabular-nums" id="dashboard-total-expense">Rp 0</div>
+        <div class="subtext" id="dashboard-expense-subtext">0 pengeluaran terdaftar bulan ini</div>
       </div>
 
       <!-- Stat Grid -->
       <div class="stat-grid">
         <div class="stat-card">
           <div class="stat-label">Saldo Bulan Ini</div>
-          <div class="stat-value rs-tabular-nums" style="color:var(--rs-income)">+Rp 3.150.000</div>
+          <div class="stat-value rs-tabular-nums" id="dashboard-total-balance" style="color:var(--rs-income)">+Rp 0</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Transaksi Impulsif</div>
-          <div class="stat-value rs-tabular-nums" style="color:var(--rs-warning)">30% (6 tx)</div>
+          <div class="stat-value rs-tabular-nums" id="dashboard-impulsive-stat" style="color:var(--rs-warning)">0% (0 tx)</div>
         </div>
       </div>
 
@@ -895,12 +895,7 @@
     let selectedEmosi = 'Stres';
     let isPlanned = true;
 
-    const initialDefaultTx = [
-      { id: 1, jenis: 'Pengeluaran', nominal: 75000, kategori: 'Makanan & Minuman', icon: 'utensils', emosi: 'Stres', dotClass: 'stres', planned: false, tgl: 'Hari ini' },
-      { id: 2, jenis: 'Pengeluaran', nominal: 120000, kategori: 'Belanja', icon: 'shopping-bag', emosi: 'Bosan', dotClass: 'bosan', planned: false, tgl: 'Hari ini' },
-      { id: 3, jenis: 'Pemasukan', nominal: 4500000, kategori: 'Gaji', icon: 'arrow-down-left', emosi: '', dotClass: '', planned: true, tgl: 'Kemarin' },
-      { id: 4, jenis: 'Pengeluaran', nominal: 45000, kategori: 'Transport', icon: 'car', emosi: 'Puas', dotClass: 'puas', planned: true, tgl: 'Kemarin' }
-    ];
+    const initialDefaultTx = [];
 
     // Load from localStorage if available
     const savedTx = localStorage.getItem('rs_transactions');
@@ -1390,14 +1385,17 @@
       const impulsivePct = expenseCount > 0 ? Math.round((impulsiveCount / expenseCount) * 100) : 0;
       const netBalance = totalIncome - totalExpense;
 
-      const expenseEl = document.querySelector('.summary-card .amount.expense');
+      const expenseEl = document.getElementById('dashboard-total-expense');
       if (expenseEl) expenseEl.innerText = `Rp ${totalExpense.toLocaleString('id-ID')}`;
 
-      const statValues = document.querySelectorAll('.stat-card .stat-value');
-      if (statValues.length >= 2) {
-        statValues[0].innerText = `${netBalance >= 0 ? '+' : ''}Rp ${netBalance.toLocaleString('id-ID')}`;
-        statValues[1].innerText = `${impulsivePct}% (${impulsiveCount} tx)`;
-      }
+      const balanceEl = document.getElementById('dashboard-total-balance');
+      if (balanceEl) balanceEl.innerText = `${netBalance >= 0 ? '+' : ''}Rp ${netBalance.toLocaleString('id-ID')}`;
+
+      const impulsiveEl = document.getElementById('dashboard-impulsive-stat');
+      if (impulsiveEl) impulsiveEl.innerText = `${impulsivePct}% (${impulsiveCount} tx)`;
+
+      const subtextEl = document.getElementById('dashboard-expense-subtext');
+      if (subtextEl) subtextEl.innerText = `${expenseCount} pengeluaran terdaftar bulan ini`;
     }
 
     function renderInsightTab() {
