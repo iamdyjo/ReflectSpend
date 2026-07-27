@@ -1,0 +1,11 @@
+Metode_Pembayaran,Tipe
+Cash,Tunai
+Debit / Transfer Bank,Bank
+Kartu Kredit,Bank
+QRIS,Digital
+GoPay,E-Wallet
+OVO,E-Wallet
+Dana,E-Wallet
+ShopeePay,E-Wallet
+Paylater,Kredit
+Lainnya,Lainnya

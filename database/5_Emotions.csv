@@ -1,0 +1,7 @@
+Emosi,Hex_Warna,Emoji_Indicator,Valensi,Frekuensi_Formula
+Senang,#FFB800,🟡,Positif,"=COUNTIF(Transactions!G:G; ""Senang"")"
+Puas,#34C759,🟢,Positif,"=COUNTIF(Transactions!G:G; ""Puas"")"
+Stres,#FF3B30,🔴,Negatif,"=COUNTIF(Transactions!G:G; ""Stres"")"
+Cemas,#FF9500,🟠,Negatif,"=COUNTIF(Transactions!G:G; ""Cemas"")"
+Sedih,#5E5CE6,🟣,Negatif,"=COUNTIF(Transactions!G:G; ""Sedih"")"
+Bosan,#8E8E93,⚪,Netral-negatif,"=COUNTIF(Transactions!G:G; ""Bosan"")"

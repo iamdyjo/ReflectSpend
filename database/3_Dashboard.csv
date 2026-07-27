@@ -1,0 +1,7 @@
+Metrik,Nilai,Formula_Google_Sheets
+Total Pengeluaran Bulan Ini,"=SUMIFS(Transactions!D:D; Transactions!C:C; ""Pengeluaran""; Transactions!B:B; "">=""&EOMONTH(TODAY();-1)+1; Transactions!B:B; ""<=""&EOMONTH(TODAY();0))","Calculates current month expenses"
+Total Pemasukan Bulan Ini,"=SUMIFS(Transactions!D:D; Transactions!C:C; ""Pemasukan""; Transactions!B:B; "">=""&EOMONTH(TODAY();-1)+1; Transactions!B:B; ""<=""&EOMONTH(TODAY();0))","Calculates current month income"
+Saldo Bulan Ini,"=B3-B2","Net balance"
+% Impulsif,"=IFERROR(COUNTIFS(Transactions!I:I;""Tidak"";Transactions!C:C;""Pengeluaran"")/COUNTIFS(Transactions!C:C;""Pengeluaran""); 0)","Impulsive transaction ratio"
+Emosi Dominan,"=IFERROR(INDEX(Emotions!A:A; MATCH(MAX(Emotions!B:B);Emotions!B:B;0));""—"")","Most frequent emotion"
+Insight Naratif Utama,"=IF(COUNTIFS(Transactions!C:C;""Pengeluaran"")<15; ""Catat ""&(15-COUNTIFS(Transactions!C:C;""Pengeluaran""))&"" transaksi lagi untuk melihat polamu.""; TEXT(SUMIFS(Transactions!D:D;Transactions!G:G;""Stres"";Transactions!C:C;""Pengeluaran"")/SUMIFS(Transactions!D:D;Transactions!C:C;""Pengeluaran"");""0%"")&"" pengeluaranmu bulan ini terjadi saat merasa stres."")","Automated insight sentence"
