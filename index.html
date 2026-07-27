@@ -1156,15 +1156,60 @@
       document.getElementById('tx-modal').classList.remove('active');
     }
 
+    // Category Map per Jenis Transaksi
+    const categoryMap = {
+      Pengeluaran: [
+        { value: "Makanan & Minuman", text: "🍴 Makanan & Minuman", icon: "utensils" },
+        { value: "Transport", text: "🚗 Transport", icon: "car" },
+        { value: "Belanja", text: "🛍️ Belanja", icon: "shopping-bag" },
+        { value: "Hiburan", text: "🎬 Hiburan", icon: "film" },
+        { value: "Tagihan & Langganan", text: "📄 Tagihan & Langganan", icon: "file-text" },
+        { value: "Kesehatan", text: "🏥 Kesehatan", icon: "heart-pulse" },
+        { value: "Pendidikan", text: "📚 Pendidikan", icon: "graduation-cap" },
+        { value: "Sosial", text: "🎁 Sosial", icon: "gift" },
+        { value: "Lainnya", text: "⚙️ Lainnya", icon: "more-horizontal" }
+      ],
+      Pemasukan: [
+        { value: "Gaji", text: "💼 Gaji", icon: "briefcase" },
+        { value: "Bonus / THR", text: "🎁 Bonus / THR", icon: "gift" },
+        { value: "Freelance", text: "💻 Freelance", icon: "laptop" },
+        { value: "Penjualan", text: "🏷️ Penjualan", icon: "tag" },
+        { value: "Hadiah", text: "💖 Hadiah", icon: "heart" },
+        { value: "Pengembalian Dana", text: "🔄 Pengembalian Dana", icon: "rotate-ccw" },
+        { value: "Lainnya", text: "⚙️ Lainnya", icon: "more-horizontal" }
+      ],
+      Transfer: [
+        { value: "Transfer Antar Rekening", text: "🔄 Transfer Antar Rekening", icon: "arrow-right-left" },
+        { value: "Top Up E-Wallet", text: "📱 Top Up E-Wallet", icon: "smartphone" },
+        { value: "Tarik Tunai", text: "🏧 Tarik Tunai", icon: "banknote" },
+        { value: "Setor Tunai", text: "🏦 Setor Tunai", icon: "building-bank" },
+        { value: "Investasi / Tabungan", text: "📈 Investasi / Tabungan", icon: "trending-up" },
+        { value: "Lainnya", text: "⚙️ Lainnya", icon: "more-horizontal" }
+      ]
+    };
+
+    function updateCategoryOptions(jenis) {
+      const selectEl = document.getElementById('tx-kategori');
+      if (!selectEl) return;
+      const list = categoryMap[jenis] || categoryMap.Pengeluaran;
+      selectEl.innerHTML = list.map(c => `<option value="${c.value}">${c.text}</option>`).join('');
+    }
+
     // Form Controls
     function setJenis(jenis) {
       currentJenis = jenis;
-      const btns = event.currentTarget.parentElement.querySelectorAll('.segment-btn');
-      btns.forEach(b => b.classList.remove('active'));
-      event.currentTarget.classList.add('active');
+      if (event && event.currentTarget) {
+        const btns = event.currentTarget.parentElement.querySelectorAll('.segment-btn');
+        btns.forEach(b => b.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+      }
 
       const emosiSection = document.getElementById('section-emosi');
-      emosiSection.style.display = (jenis === 'Pengeluaran') ? 'block' : 'none';
+      if (emosiSection) {
+        emosiSection.style.display = (jenis === 'Pengeluaran') ? 'block' : 'none';
+      }
+
+      updateCategoryOptions(jenis);
     }
 
     function selectEmosi(emosi, chipEl) {
@@ -1185,15 +1230,19 @@
       const nominal = parseInt(document.getElementById('tx-nominal').value);
       const kategori = document.getElementById('tx-kategori').value;
 
+      const catList = categoryMap[currentJenis] || [];
+      const matchedCat = catList.find(c => c.value === kategori);
+      const iconName = matchedCat ? matchedCat.icon : (currentJenis === 'Pemasukan' ? 'arrow-down-left' : (currentJenis === 'Transfer' ? 'arrow-right-left' : 'credit-card'));
+
       const newTx = {
         id: Date.now(),
         jenis: currentJenis,
         nominal: nominal,
         kategori: kategori,
-        icon: 'credit-card',
+        icon: iconName,
         emosi: currentJenis === 'Pengeluaran' ? selectedEmosi : '',
-        dotClass: selectedEmosi.toLowerCase(),
-        planned: isPlanned,
+        dotClass: currentJenis === 'Pengeluaran' ? selectedEmosi.toLowerCase() : '',
+        planned: currentJenis === 'Pengeluaran' ? isPlanned : true,
         tgl: 'Hari ini'
       };
 
@@ -1210,8 +1259,8 @@
         kategori: kategori,
         metode: 'QRIS',
         emosi: currentJenis === 'Pengeluaran' ? selectedEmosi : '',
-        skala: document.getElementById('tx-skala').value,
-        direncanakan: isPlanned ? 'Ya' : 'Tidak'
+        skala: currentJenis === 'Pengeluaran' ? document.getElementById('tx-skala').value : '',
+        direncanakan: currentJenis === 'Pengeluaran' ? (isPlanned ? 'Ya' : 'Tidak') : 'Ya'
       });
 
       alert(`Transaksi tersimpan! ${currentJenis} Rp ${nominal.toLocaleString('id-ID')}${currentJenis === 'Pengeluaran' ? ' (Emosi: ' + selectedEmosi + ')' : ''}.`);
