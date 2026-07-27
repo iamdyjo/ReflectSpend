@@ -79,13 +79,24 @@
       color: var(--rs-accent);
     }
 
-    .header-badge {
-      font-size: 11px;
-      font-weight: 500;
-      padding: 3px 8px;
+    .user-avatar-btn {
+      height: 34px;
+      padding: 0 10px;
+      border-radius: 17px;
+      background-color: var(--rs-bg-secondary);
+      border: var(--rs-border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--rs-text-primary);
+      transition: background-color 0.15s ease;
+    }
+
+    .user-avatar-btn:hover {
       background-color: var(--rs-bg-tertiary);
-      color: var(--rs-text-secondary);
-      border-radius: 12px;
     }
 
     /* Tab Content Section */
@@ -655,6 +666,9 @@
         <i data-lucide="wallet" class="brand-accent"></i>
         <span>Reflect<span class="brand-accent">Spend</span></span>
       </div>
+      <button class="user-avatar-btn" onclick="openProfileModal()" aria-label="Profil dan Pengaturan">
+        <span id="user-avatar-text">👤 Masuk</span>
+      </button>
     </header>
 
     <!-- FAB Button -->
@@ -891,6 +905,17 @@
 
           <button type="submit" class="btn-primary" style="margin-top:24px;">Simpan Transaksi</button>
         </form>
+    <!-- Modal Profil & Reset Data -->
+    <div class="modal-overlay" id="profile-modal">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <div class="modal-title">Akun & Pengaturan</div>
+          <button class="btn-close" onclick="closeProfileModal()" aria-label="Tutup modal profil"><i data-lucide="x"></i></button>
+        </div>
+
+        <div id="profile-content" style="padding-top:4px;">
+          <!-- Dynamic Profile JS Content -->
+        </div>
       </div>
     </div>
 
@@ -1265,6 +1290,145 @@
 
       alert(`Transaksi tersimpan! ${currentJenis} Rp ${nominal.toLocaleString('id-ID')}${currentJenis === 'Pengeluaran' ? ' (Emosi: ' + selectedEmosi + ')' : ''}.`);
     }
+
+    // User Profile & Reset Data State
+    let userProfile = JSON.parse(localStorage.getItem('rs_user_profile')) || null;
+
+    function openProfileModal() {
+      renderProfileContent();
+      document.getElementById('profile-modal').classList.add('active');
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profile-modal').classList.remove('active');
+    }
+
+    function renderProfileContent() {
+      const container = document.getElementById('profile-content');
+      const avatarBtnText = document.getElementById('user-avatar-text');
+      if (!container || !avatarBtnText) return;
+      
+      if (userProfile && userProfile.name) {
+        avatarBtnText.innerHTML = `👤 ${userProfile.name.split(' ')[0]}`;
+        container.innerHTML = `
+          <div class="summary-card" style="margin-bottom:16px; border:var(--rs-border); background:var(--rs-bg-secondary);">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+              <div style="width:48px; height:48px; border-radius:50%; background:var(--rs-accent); color:#FFF; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700;">
+                ${userProfile.name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <div style="font-size:16px; font-weight:700; color:var(--rs-text-primary);">${userProfile.name}</div>
+                <div style="font-size:13px; color:var(--rs-text-secondary);">${userProfile.email || 'Akun Pengguna'}</div>
+              </div>
+            </div>
+            <button class="btn-secondary" style="width:100%; font-size:13px; height:38px;" onclick="handleLogout()">Keluar / Ganti Akun</button>
+          </div>
+
+          <div class="form-group" style="margin-top:20px;">
+            <label class="form-label" style="color:var(--rs-expense); font-weight:600;">Area Bahaya (Data)</label>
+            <p style="font-size:13px; color:var(--rs-text-secondary); margin-bottom:12px;">Reset akan menghapus seluruh riwayat transaksi & refleksi lokal untuk memulai dari awal.</p>
+            <button class="btn-secondary" style="width:100%; color:var(--rs-expense); border-color:rgba(255,59,48,0.3); font-weight:600; height:44px;" onclick="handleResetData()">
+              🗑️ Reset Seluruh Data Transaksi
+            </button>
+          </div>
+        `;
+      } else {
+        avatarBtnText.innerHTML = `👤 Masuk`;
+        container.innerHTML = `
+          <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label class="form-label" for="login-name">Nama Pengguna</label>
+              <input type="text" id="login-name" class="form-control" placeholder="e.g. Rangga" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="login-email">Email (Opsional)</label>
+              <input type="email" id="login-email" class="form-control" placeholder="e.g. rangga@example.com">
+            </div>
+            <button type="submit" class="btn-primary" style="margin-top:16px;">Masuk / Simpan Profil</button>
+          </form>
+
+          <div style="border-top:var(--rs-border); margin-top:20px; padding-top:16px;">
+            <label class="form-label" style="color:var(--rs-expense); font-weight:600;">Reset Data</label>
+            <button class="btn-secondary" style="width:100%; color:var(--rs-expense); border-color:rgba(255,59,48,0.3); font-weight:600; height:44px; margin-top:8px;" onclick="handleResetData()">
+              🗑️ Reset Seluruh Data Transaksi
+            </button>
+          </div>
+        `;
+      }
+      lucide.createIcons();
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const name = document.getElementById('login-name').value.trim();
+      const email = document.getElementById('login-email').value.trim();
+
+      if (name) {
+        userProfile = { name, email };
+        localStorage.setItem('rs_user_profile', JSON.stringify(userProfile));
+        renderProfileContent();
+        closeProfileModal();
+        alert(`Selamat datang, ${name}! Profil kamu tersimpan.`);
+      }
+    }
+
+    function handleLogout() {
+      userProfile = null;
+      localStorage.removeItem('rs_user_profile');
+      renderProfileContent();
+      alert('Kamu telah keluar dari profil.');
+    }
+
+    function handleResetData() {
+      if (confirm('Apakah kamu yakin ingin mereset dan menghapus SELURUH data transaksi & refleksi? Data yang terhapus tidak dapat dikembalikan.')) {
+        mockTransactions = [];
+        localStorage.removeItem('rs_transactions');
+        localStorage.removeItem('rs_reflection_answers');
+        localStorage.removeItem('rs_reflection_submitted');
+        
+        isReflectionSubmitted = false;
+        currentReflectionStep = 0;
+        reflectionAnswers = ["", "", "", "", "", ""];
+
+        populateLists();
+        renderReflectionCard();
+        updateSummaryCardTotals();
+        closeProfileModal();
+        alert('Seluruh data transaksi & refleksi berhasil direset!');
+      }
+    }
+
+    function updateSummaryCardTotals() {
+      let totalExpense = 0;
+      let totalIncome = 0;
+      let impulsiveCount = 0;
+      let expenseCount = 0;
+
+      mockTransactions.forEach(tx => {
+        if (tx.jenis === 'Pengeluaran') {
+          totalExpense += parseInt(tx.nominal) || 0;
+          expenseCount++;
+          if (!tx.planned) impulsiveCount++;
+        } else if (tx.jenis === 'Pemasukan') {
+          totalIncome += parseInt(tx.nominal) || 0;
+        }
+      });
+
+      const impulsivePct = expenseCount > 0 ? Math.round((impulsiveCount / expenseCount) * 100) : 0;
+      const netBalance = totalIncome - totalExpense;
+
+      const expenseEl = document.querySelector('.summary-card .amount.expense');
+      if (expenseEl) expenseEl.innerText = `Rp ${totalExpense.toLocaleString('id-ID')}`;
+
+      const statValues = document.querySelectorAll('.stat-card .stat-value');
+      if (statValues.length >= 2) {
+        statValues[0].innerText = `${netBalance >= 0 ? '+' : ''}Rp ${netBalance.toLocaleString('id-ID')}`;
+        statValues[1].innerText = `${impulsivePct}% (${impulsiveCount} tx)`;
+      }
+    }
+
+    // Initial Profile Setup on Load
+    renderProfileContent();
 
     // Register Service Worker for PWA Offline Support
     if ('serviceWorker' in navigator) {
