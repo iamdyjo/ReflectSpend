@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tambah Transaksi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#454746",
+                        "on-surface-variant": "#414755",
+                        "surface-variant": "#e5e2e1",
+                        "surface-container-high": "#eae7e7",
+                        "on-error": "#ffffff",
+                        "primary-container": "#0070eb",
+                        "secondary": "#5d5f5d",
+                        "surface-container-highest": "#e5e2e1",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#fcf9f8",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#fefcff",
+                        "inverse-on-surface": "#f3f0ef",
+                        "secondary-container": "#e2e3e1",
+                        "tertiary-container": "#c64f00",
+                        "background": "#fcf9f8",
+                        "on-primary-fixed-variant": "#004493",
+                        "on-secondary-container": "#636563",
+                        "tertiary-fixed": "#ffdbcc",
+                        "outline": "#717786",
+                        "error": "#ba1a1a",
+                        "surface-container": "#f0eded",
+                        "on-tertiary-fixed": "#351000",
+                        "surface-dim": "#dcd9d9",
+                        "inverse-primary": "#adc6ff",
+                        "on-background": "#1c1b1b",
+                        "secondary-fixed": "#e2e3e1",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c1c6d7",
+                        "on-secondary-fixed": "#1a1c1b",
+                        "inverse-surface": "#313030",
+                        "on-primary-fixed": "#001a41",
+                        "primary-fixed-dim": "#adc6ff",
+                        "secondary-fixed-dim": "#c6c7c5",
+                        "primary": "#0058bc",
+                        "tertiary-fixed-dim": "#ffb595",
+                        "on-tertiary-fixed-variant": "#7c2e00",
+                        "surface-container-low": "#f6f3f2",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#9e3d00",
+                        "surface-tint": "#005bc1",
+                        "primary-fixed": "#d8e2ff",
+                        "on-surface": "#1c1b1b",
+                        "on-tertiary-container": "#fffbff",
+                        "on-primary": "#ffffff",
+                        "surface-bright": "#fcf9f8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "margin-mobile": "16px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "sm": "8px",
+                        "margin-desktop": "40px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["Inter"],
+                        "body-secondary": ["Inter"],
+                        "display-amount": ["Inter"],
+                        "section-title": ["Inter"],
+                        "card-title": ["Inter"],
+                        "metadata": ["Inter"],
+                        "page-title": ["Inter"],
+                        "body-main": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "600" }],
+                        "body-secondary": ["15px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-amount": ["34px", { "lineHeight": "41px", "letterSpacing": "-0.5px", "fontWeight": "700" }],
+                        "section-title": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "card-title": ["17px", { "lineHeight": "22px", "fontWeight": "600" }],
+                        "metadata": ["13px", { "lineHeight": "18px", "letterSpacing": "0.1px", "fontWeight": "400" }],
+                        "page-title": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.4px", "fontWeight": "600" }],
+                        "body-main": ["17px", { "lineHeight": "22px", "fontWeight": "400" }]
+                    }
+                },
+            }
+        }
+    </script>
+<style>
+        body { background-color: #F7F7F5; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .input-no-ring:focus { outline: none; box-shadow: none; border-color: #E5E5E3; }
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px solid #E5E5E3;
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #EFEFED;
+            border-radius: 2px;
+        }
+        .emotion-red { background-color: #ba1a1a; }
+        .emotion-green { background-color: #107C41; }
+        .emotion-blue { background-color: #007AFF; }
+        .emotion-yellow { background-color: #FFB900; }
+        .emotion-purple { background-color: #8764B8; }
+        .emotion-orange { background-color: #D83B01; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-background min-h-screen pb-24 md:pb-0 md:pl-60">
+<!-- Desktop Sidebar - Suppressed for transactional screen as per rules, but included if needed based on generic requirement. Suppressed for true transactional logic. -->
+<!-- Header -->
+<header class="fixed top-0 left-0 w-full z-50 bg-surface border-b border-surface-variant flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 md:pl-[calc(240px+40px)]">
+<button class="font-body-main text-body-main text-primary hover:text-primary-fixed-dim transition-colors">Batal</button>
+<h1 class="font-card-title text-card-title text-on-surface">Tambah Transaksi</h1>
+<button class="font-body-main text-body-main text-on-surface-variant opacity-50 cursor-not-allowed">Simpan</button>
+</header>
+<!-- Main Canvas -->
+<main class="pt-24 px-margin-mobile md:px-margin-desktop max-w-[600px] mx-auto">
+<!-- Segmented Control -->
+<div class="flex bg-[#EFEFED] p-1 rounded-lg mb-8 border border-surface-variant">
+<button class="flex-1 py-2 text-center font-metadata text-metadata font-semibold bg-white rounded shadow-sm text-on-surface">Pengeluaran</button>
+<button class="flex-1 py-2 text-center font-metadata text-metadata text-on-surface-variant hover:text-on-surface">Pemasukan</button>
+<button class="flex-1 py-2 text-center font-metadata text-metadata text-on-surface-variant hover:text-on-surface">Transfer</button>
+</div>
+<!-- Amount Input -->
+<div class="text-center mb-10">
+<input class="w-full text-center font-display-amount text-display-amount text-on-surface bg-transparent border-none input-no-ring p-0 m-0" readonly="" type="text" value="Rp 75.000"/>
+<p class="font-metadata text-metadata text-on-surface-variant mt-2">Saldo saat ini: Rp 4.520.000</p>
+</div>
+<!-- Details Form -->
+<div class="bg-surface-container-lowest rounded-xl border border-surface-variant overflow-hidden mb-8">
+<div class="flex items-center justify-between p-4 border-b border-surface-variant hover:bg-surface-container-low cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 0;">calendar_today</span>
+<span class="font-body-main text-body-main text-on-surface">Tanggal</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-body-secondary text-body-secondary text-on-surface-variant">10 Jan 2025</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm" style="font-variation-settings: 'FILL' 0;">chevron_right</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 border-b border-surface-variant hover:bg-surface-container-low cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 0;">category</span>
+<span class="font-body-main text-body-main text-on-surface">Kategori</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-body-secondary text-body-secondary text-on-surface-variant">Makanan &amp; Minuman</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm" style="font-variation-settings: 'FILL' 0;">chevron_right</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 hover:bg-surface-container-low cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 0;">account_balance_wallet</span>
+<span class="font-body-main text-body-main text-on-surface">Metode Pembayaran</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-body-secondary text-body-secondary text-on-surface-variant">QRIS</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm" style="font-variation-settings: 'FILL' 0;">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Emotion Section -->
+<div class="mb-10">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant mb-4 uppercase tracking-wider">BAGAIMANA PERASAANMU SETELAH TRANSAKSI INI?</h2>
+<div class="flex flex-wrap gap-3 mb-6">
+<button class="px-4 py-2 rounded-full border border-surface-variant font-metadata text-metadata text-on-surface hover:bg-surface-container-low transition-colors">Senang</button>
+<button class="px-4 py-2 rounded-full border border-surface-variant font-metadata text-metadata bg-error text-on-error transition-colors flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-white opacity-80"></span>
+                    Stres
+                </button>
+<button class="px-4 py-2 rounded-full border border-surface-variant font-metadata text-metadata text-on-surface hover:bg-surface-container-low transition-colors">Bosan</button>
+<button class="px-4 py-2 rounded-full border border-surface-variant font-metadata text-metadata text-on-surface hover:bg-surface-container-low transition-colors">Sedih</button>
+<button class="px-4 py-2 rounded-full border border-surface-variant font-metadata text-metadata text-on-surface hover:bg-surface-container-low transition-colors">Cemas</button>
+<button class="px-4 py-2 rounded-full border border-surface-variant font-metadata text-metadata text-on-surface hover:bg-surface-container-low transition-colors">Puas</button>
+</div>
+<div class="bg-surface-container-lowest p-5 rounded-xl border border-surface-variant">
+<div class="flex justify-between items-end mb-4">
+<span class="font-metadata text-metadata text-on-surface-variant">Intensitas Emosi</span>
+<span class="font-card-title text-card-title text-error">8</span>
+</div>
+<div class="relative w-full mb-2">
+<div class="absolute top-1/2 left-0 w-full h-[6px] -mt-[3px] rounded bg-[#EFEFED]">
+<div class="h-full bg-error rounded" style="width: 80%;"></div>
+</div>
+<input class="relative z-10 w-full opacity-0 cursor-pointer h-6" max="10" min="1" type="range" value="8"/>
+<div class="absolute top-1/2 -mt-[12px] h-[24px] w-[24px] bg-white border-2 border-error rounded-full pointer-events-none shadow-sm" style="left: calc(80% - 12px);"></div>
+</div>
+<div class="flex justify-between font-metadata text-metadata text-on-surface-variant">
+<span>Ringan</span>
+<span>Sangat kuat</span>
+</div>
+</div>
+</div>
+<!-- Planned Section -->
+<div class="bg-surface-container-lowest p-5 rounded-xl border border-surface-variant mb-6 flex justify-between items-center">
+<div>
+<h3 class="font-body-main text-body-main text-on-surface">Apakah pengeluaran ini direncanakan?</h3>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 rounded-full border border-surface-variant font-metadata text-metadata text-on-surface hover:bg-surface-container-low transition-colors">Ya</button>
+<button class="px-4 py-2 rounded-full border border-tertiary-container bg-tertiary-fixed text-on-tertiary-fixed-variant font-metadata text-metadata transition-colors flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container"></span>
+                    Tidak
+                </button>
+</div>
+</div>
+<!-- Additional Details -->
+<div class="mb-12">
+<button class="flex items-center gap-2 font-body-secondary text-body-secondary text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">expand_more</span>
+                Detail tambahan (opsional)
+            </button>
+</div>
+</main>
+</body></html>

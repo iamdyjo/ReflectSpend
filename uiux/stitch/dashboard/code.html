@@ -1,0 +1,318 @@
+<!DOCTYPE html><html lang="id" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ReflectSpend - Beranda</title>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config from Style Guidance -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#454746",
+                        "on-surface-variant": "#414755",
+                        "surface-variant": "#e5e2e1",
+                        "surface-container-high": "#eae7e7",
+                        "on-error": "#ffffff",
+                        "primary-container": "#0070eb",
+                        "secondary": "#5d5f5d",
+                        "surface-container-highest": "#e5e2e1",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#fcf9f8",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#fefcff",
+                        "inverse-on-surface": "#f3f0ef",
+                        "secondary-container": "#e2e3e1",
+                        "tertiary-container": "#c64f00",
+                        "background": "#fcf9f8",
+                        "on-primary-fixed-variant": "#004493",
+                        "on-secondary-container": "#636563",
+                        "tertiary-fixed": "#ffdbcc",
+                        "outline": "#717786",
+                        "error": "#ba1a1a",
+                        "surface-container": "#f0eded",
+                        "on-tertiary-fixed": "#351000",
+                        "surface-dim": "#dcd9d9",
+                        "inverse-primary": "#adc6ff",
+                        "on-background": "#1c1b1b",
+                        "secondary-fixed": "#e2e3e1",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c1c6d7",
+                        "on-secondary-fixed": "#1a1c1b",
+                        "inverse-surface": "#313030",
+                        "on-primary-fixed": "#001a41",
+                        "primary-fixed-dim": "#adc6ff",
+                        "secondary-fixed-dim": "#c6c7c5",
+                        "primary": "#007AFF", // Updated to match primary accent in prompt
+                        "tertiary-fixed-dim": "#ffb595",
+                        "on-tertiary-fixed-variant": "#7c2e00",
+                        "surface-container-low": "#f6f3f2",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#9e3d00",
+                        "surface-tint": "#005bc1",
+                        "primary-fixed": "#d8e2ff",
+                        "on-surface": "#1c1b1b",
+                        "on-tertiary-container": "#fffbff",
+                        "on-primary": "#ffffff",
+                        "surface-bright": "#fcf9f8",
+                        // Custom additions for Emotion dots based on prompt context
+                        "emotion-stress": "#F59E0B", // Amber
+                        "emotion-neutral": "#9CA3AF", // Gray
+                        "emotion-happy": "#10B981"  // Green
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "card": "12px" // Added from spec
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "margin-mobile": "16px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "sm": "8px",
+                        "margin-desktop": "40px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["Inter", "sans-serif"],
+                        "body-secondary": ["Inter", "sans-serif"],
+                        "display-amount": ["Inter", "sans-serif"],
+                        "section-title": ["Inter", "sans-serif"],
+                        "card-title": ["Inter", "sans-serif"],
+                        "metadata": ["Inter", "sans-serif"],
+                        "page-title": ["Inter", "sans-serif"],
+                        "body-main": ["Inter", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "600" }],
+                        "body-secondary": ["15px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-amount": ["34px", { "lineHeight": "41px", "letterSpacing": "-0.5px", "fontWeight": "700" }],
+                        "section-title": ["22px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "card-title": ["17px", { "lineHeight": "22px", "fontWeight": "600" }],
+                        "metadata": ["13px", { "lineHeight": "18px", "letterSpacing": "0.1px", "fontWeight": "400" }],
+                        "page-title": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.4px", "fontWeight": "600" }],
+                        "body-main": ["17px", { "lineHeight": "22px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom styles for components not fully handled by Tailwind config */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid #E5E5E3;
+        }
+        
+        .transaction-item {
+            height: 72px;
+            border: 1px solid #E5E5E3;
+        }
+        
+        .emotion-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* Material Symbols utility */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-main antialiased min-h-screen pb-24 md:pb-8 flex justify-center">
+<!-- Navigation Drawer (Desktop) -->
+<nav class="hidden md:flex flex-col fixed left-0 top-0 h-full w-60 p-md z-40 bg-surface border-r border-[#E5E5E3]">
+<div class="font-page-title text-page-title font-bold text-primary mb-8 tracking-tight">ReflectSpend</div>
+<div class="flex flex-col gap-sm">
+<!-- Active Tab: Beranda -->
+<a class="flex items-center gap-sm bg-secondary-container text-primary rounded-lg px-md py-sm border-l-[3px] border-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined material-symbols-fill">home</span>
+<span class="font-body-main text-body-main">Beranda</span>
+</a>
+<a class="flex items-center gap-sm text-on-surface-variant px-md py-sm hover:bg-[#EFEFED] rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-body-main text-body-main">Riwayat</span>
+</a>
+<a class="flex items-center gap-sm text-on-surface-variant px-md py-sm hover:bg-[#EFEFED] rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span class="font-body-main text-body-main">Insight</span>
+</a>
+<a class="flex items-center gap-sm text-on-surface-variant px-md py-sm hover:bg-[#EFEFED] rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">psychology</span>
+<span class="font-body-main text-body-main">Refleksi</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="w-full md:pl-60">
+<!-- TopAppBar (Mobile & Desktop) -->
+<header class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-16 bg-surface border-b border-[#E5E5E3] sticky top-0 z-30">
+<div class="flex items-center gap-sm">
+<button class="md:hidden text-on-surface-variant hover:bg-surface-container-high rounded-full p-2 transition-colors duration-200">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<img src="https://lh3.googleusercontent.com/aida/AP1WRLtorfmP9fsGQd7AfHAfBqcNdy7WELYlh64RK3mxELJYVSPs82efSBP5eM45ya9al1OXdav1bKzoQggVrZg5avkMYqepcl_9APJifBH4mALUI-5ccgZdhA4zU938FlLhamFxpQUyNZJYAeeWt3lXdP-s0K7xHuaEOXjFkOP8scvs3r_NoL2HrIaapIglUPtF4CE_-X0rJe2Fli-MKAjFlL3yy1OlorzH-e2_jr74s-1EKjFlWGjlOWeRPDWH" alt="ReflectSpend Wordmark" class="h-6 w-auto object-contain">
+</div>
+<div class="flex items-center gap-sm cursor-pointer hover:bg-surface-container-high px-sm py-xs rounded-lg transition-colors duration-200 border border-[#E5E5E3] bg-[#EFEFED]">
+<span class="font-body-secondary text-body-secondary text-on-surface-variant">Januari 2025</span>
+<span class="material-symbols-outlined text-sm text-on-surface-variant">arrow_drop_down</span>
+</div>
+</header>
+<!-- Content Area constrained to max-width 600px for focus -->
+<div class="max-w-[600px] mx-auto w-full px-margin-mobile md:px-0 mt-lg flex flex-col gap-lg pb-xl">
+<!-- Main Balance Card -->
+<section class="glass-card rounded-card p-lg flex flex-col items-center justify-center text-center shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider mb-xs">SALDO BULAN INI</p>
+<h2 class="font-display-amount text-display-amount text-on-surface tracking-tight">Rp2.150.000</h2>
+</section>
+<!-- Income / Expense Grid -->
+<section class="grid grid-cols-2 gap-sm">
+<div class="glass-card rounded-card p-md flex flex-col gap-xs">
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[#10B981] text-lg">arrow_downward</span>
+<span class="font-label-caps text-label-caps uppercase">PEMASUKAN</span>
+</div>
+<p class="font-card-title text-card-title text-on-surface">Rp5.000.000</p>
+</div>
+<div class="glass-card rounded-card p-md flex flex-col gap-xs">
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-error text-lg">arrow_upward</span>
+<span class="font-label-caps text-label-caps uppercase">PENGELUARAN</span>
+</div>
+<p class="font-card-title text-card-title text-on-surface">Rp2.850.000</p>
+</div>
+</section>
+<!-- Summary Bento Card -->
+<section class="glass-card rounded-card p-md flex flex-col gap-md">
+<h3 class="font-card-title text-card-title text-on-surface border-b border-[#E5E5E3] pb-sm">RINGKASAN</h3>
+<div class="flex flex-col gap-sm">
+<div class="flex justify-between items-center">
+<span class="font-body-secondary text-body-secondary text-on-surface-variant">Kategori terbesar</span>
+<span class="font-body-main text-body-main text-on-surface">Makanan &amp; Minuman</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-secondary text-body-secondary text-on-surface-variant">Emosi dominan</span>
+<div class="flex items-center gap-xs">
+<span class="emotion-dot bg-emotion-stress"></span>
+<span class="font-body-main text-body-main text-on-surface">Stres</span>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-secondary text-body-secondary text-on-surface-variant">Tidak direncanakan</span>
+<span class="font-body-main text-body-main text-on-surface font-semibold">12 transaksi</span>
+</div>
+</div>
+</section>
+<!-- Recent Transactions List -->
+<section class="flex flex-col gap-sm">
+<div class="flex justify-between items-end mb-sm px-xs">
+<h3 class="font-section-title text-section-title text-on-surface tracking-tight">TRANSAKSI TERAKHIR</h3>
+<a class="font-body-secondary text-body-secondary text-primary flex items-center gap-xs hover:underline" href="#">
+                        Lihat semua <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+<div class="flex flex-col gap-sm">
+<!-- Tx Item 1 -->
+<div class="transaction-item bg-surface-container-lowest rounded-card p-md flex items-center justify-between hover:shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-shadow cursor-pointer">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-[#F7F7F5] flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-xs">
+<span class="font-body-main text-body-main text-on-surface">Makanan &amp; Minuman</span>
+<span class="emotion-dot bg-emotion-stress"></span>
+</div>
+<span class="font-metadata text-metadata text-outline">Qris • 15 Jan</span>
+</div>
+</div>
+<span class="font-body-main text-body-main text-on-surface">-Rp75.000</span>
+</div>
+<!-- Tx Item 2 -->
+<div class="transaction-item bg-surface-container-lowest rounded-card p-md flex items-center justify-between hover:shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-shadow cursor-pointer">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-[#F7F7F5] flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">directions_car</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-xs">
+<span class="font-body-main text-body-main text-on-surface">Transport</span>
+<span class="emotion-dot bg-emotion-neutral"></span>
+</div>
+<span class="font-metadata text-metadata text-outline">Cash • 14 Jan</span>
+</div>
+</div>
+<span class="font-body-main text-body-main text-on-surface">-Rp25.000</span>
+</div>
+<!-- Tx Item 3 -->
+<div class="transaction-item bg-surface-container-lowest rounded-card p-md flex items-center justify-between hover:shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-shadow cursor-pointer">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-[#F7F7F5] flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">shopping_bag</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-xs">
+<span class="font-body-main text-body-main text-on-surface">Belanja</span>
+<span class="emotion-dot bg-emotion-happy"></span>
+</div>
+<span class="font-metadata text-metadata text-outline">Debit • 12 Jan</span>
+</div>
+</div>
+<span class="font-body-main text-body-main text-on-surface">-Rp150.000</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-[88px] md:bottom-lg right-lg w-[56px] h-[56px] rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform z-40">
+<span class="material-symbols-outlined" style="font-size: 28px;">add</span>
+</button>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 bg-surface-container-lowest h-16 border-t border-[#E5E5E3]">
+<a class="flex flex-col items-center justify-center text-primary active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined material-symbols-fill">home</span>
+<span class="font-label-caps text-[10px] leading-[14px]">Beranda</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-[#f0eded] rounded-lg p-1 active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-caps text-[10px] leading-[14px]">Riwayat</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-[#f0eded] rounded-lg p-1 active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span class="font-label-caps text-[10px] leading-[14px]">Insight</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-[#f0eded] rounded-lg p-1 active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">psychology</span>
+<span class="font-label-caps text-[10px] leading-[14px]">Refleksi</span>
+</a>
+</nav>
+
+
+</body></html>
