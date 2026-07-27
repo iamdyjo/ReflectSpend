@@ -340,6 +340,19 @@
       cursor: pointer;
     }
 
+    /* Focus-Visible Outline Ring for Accessibility (Keyboard Navigation) */
+    .btn-primary:focus-visible,
+    .btn-secondary:focus-visible,
+    .chip:focus-visible,
+    .nav-item:focus-visible,
+    .fab-btn:focus-visible,
+    .segment-btn:focus-visible,
+    .btn-close:focus-visible,
+    .form-control:focus-visible {
+      outline: 2px solid var(--rs-accent);
+      outline-offset: 2px;
+    }
+
     /* Bottom Navigation Bar & FAB */
     .bottom-nav {
       position: fixed;
