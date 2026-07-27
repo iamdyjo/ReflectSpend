@@ -788,16 +788,10 @@
     <!-- Tab 4: Refleksi -->
     <section id="tab-refleksi" class="tab-content">
       <div class="section-title-sm">Refleksi Mingguan (2026-W30)</div>
-
-      <div class="summary-card" style="margin-bottom:16px;">
-        <div class="label" style="color:var(--rs-accent)">Pertanyaan 1 dari 6</div>
-        <h3 style="font-size:16px; font-weight:600; margin:6px 0;">Pengeluaran apa yang paling berpengaruh minggu ini?</h3>
-        <textarea class="form-control" style="height:90px; padding:10px; margin-top:10px;" placeholder="e.g. Makan siang terburu-buru karena tertekan deadline"></textarea>
-      </div>
-
-      <div style="display:flex; gap:10px;">
-        <button class="btn-secondary" style="flex:1;">Lewati</button>
-        <button class="btn-primary" style="flex:2;" onclick="alert('Refleksi tersimpan ke sheet Weekly_Reflections!')">Simpan & Lanjut</button>
+      
+      <!-- Interactive Card Stepper Container -->
+      <div id="reflection-card-container">
+        <!-- Rendered dynamically via renderReflectionCard() -->
       </div>
     </section>
 
@@ -1009,6 +1003,115 @@
     }
 
     populateLists();
+
+    // Reflection Card Stepper State & Logic
+    const reflectionQuestions = [
+      { id: 1, title: "Pengeluaran apa yang paling berpengaruh minggu ini?", placeholder: "e.g. Makan siang terburu-buru karena tertekan deadline" },
+      { id: 2, title: "Emosi apa yang paling sering muncul saat belanja?", placeholder: "e.g. Stres akibat pekerjaan yang belum selesai" },
+      { id: 3, title: "Adakah pembelian yang kamu sesali? Mengapa?", placeholder: "e.g. Belanja baju online impulsif di midnight sale" },
+      { id: 4, title: "Apa pemicu utama pengeluaran impulsifmu?", placeholder: "e.g. Scrolling e-commerce sebelum tidur" },
+      { id: 5, title: "Kebiasaan apa yang ingin kamu ubah minggu depan?", placeholder: "e.g. Tidak membuka aplikasi belanja di atas jam 21.00" },
+      { id: 6, title: "Apa target finansial & emosionalmu minggu depan?", placeholder: "e.g. Maksimal 2x makan di luar & lebih tenang saat bekerja" }
+    ];
+
+    let currentReflectionStep = 0;
+    let reflectionAnswers = JSON.parse(localStorage.getItem('rs_reflection_answers')) || ["", "", "", "", "", ""];
+    let isReflectionSubmitted = JSON.parse(localStorage.getItem('rs_reflection_submitted')) || false;
+
+    function renderReflectionCard() {
+      const container = document.getElementById('reflection-card-container');
+      if (!container) return;
+
+      if (isReflectionSubmitted) {
+        container.innerHTML = `
+          <div class="summary-card" style="border:var(--rs-border); background:var(--rs-bg-primary); margin-bottom:16px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px; color:var(--rs-income);">
+              <i data-lucide="sparkles" style="width:20px; height:20px;"></i>
+              <span style="font-size:15px; font-weight:600;">Refleksi Mingguan Tersimpan (2026-W30)</span>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:16px;">
+              ${reflectionQuestions.map((q, idx) => `
+                <div style="border-bottom:1px solid var(--rs-bg-tertiary); padding-bottom:10px;">
+                  <div style="font-size:11px; font-weight:600; color:var(--rs-text-secondary); margin-bottom:2px;">${q.id}. ${q.title}</div>
+                  <div style="font-size:14px; color:var(--rs-text-primary); font-weight:500;">${reflectionAnswers[idx] || '<em>(Dilewati)</em>'}</div>
+                </div>
+              `).join('')}
+            </div>
+
+            <button class="btn-secondary" style="width:100%; font-size:13px;" onclick="resetReflection()">Ulangi Refleksi Mingguan</button>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      const q = reflectionQuestions[currentReflectionStep];
+      const progressPct = Math.round(((currentReflectionStep + 1) / 6) * 100);
+
+      container.innerHTML = `
+        <div class="summary-card" style="margin-bottom:16px; border:var(--rs-border); position:relative;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="label" style="color:var(--rs-accent); margin-bottom:0;">Pertanyaan ${q.id} dari 6</span>
+            <span style="font-size:12px; font-weight:600; color:var(--rs-text-secondary);">${progressPct}%</span>
+          </div>
+          
+          <div class="bar-track" style="height:6px; margin-bottom:16px; background:var(--rs-bg-tertiary);">
+            <div class="bar-fill" style="width:${progressPct}%; background:var(--rs-accent);"></div>
+          </div>
+
+          <h3 style="font-size:16px; font-weight:600; line-height:1.4; margin-bottom:12px; color:var(--rs-text-primary);">${q.title}</h3>
+          <textarea id="reflection-input" class="form-control" style="height:96px; padding:12px; font-size:14px; line-height:1.5; resize:none;" placeholder="${q.placeholder}" oninput="reflectionAnswers[${currentReflectionStep}] = this.value">${reflectionAnswers[currentReflectionStep] || ''}</textarea>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button class="btn-secondary" style="flex:1; padding:0 12px; font-size:13px;" ${currentReflectionStep === 0 ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : 'onclick="prevReflectionStep()"'}>‹ Kembali</button>
+          <button class="btn-secondary" style="flex:1; padding:0 12px; font-size:13px;" onclick="nextReflectionStep(true)">Lewati</button>
+          <button class="btn-primary" style="flex:2; font-size:14px;" onclick="nextReflectionStep(false)">
+            ${currentReflectionStep === 5 ? 'Selesai & Simpan ✨' : 'Simpan & Lanjut ›'}
+          </button>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function prevReflectionStep() {
+      if (currentReflectionStep > 0) {
+        currentReflectionStep--;
+        renderReflectionCard();
+      }
+    }
+
+    function nextReflectionStep(isSkip) {
+      if (!isSkip) {
+        const inputEl = document.getElementById('reflection-input');
+        if (inputEl) {
+          reflectionAnswers[currentReflectionStep] = inputEl.value;
+        }
+      }
+
+      if (currentReflectionStep < 5) {
+        currentReflectionStep++;
+        renderReflectionCard();
+      } else {
+        isReflectionSubmitted = true;
+        localStorage.setItem('rs_reflection_answers', JSON.stringify(reflectionAnswers));
+        localStorage.setItem('rs_reflection_submitted', JSON.stringify(true));
+        renderReflectionCard();
+        alert('Refleksi Mingguan tersimpan!');
+      }
+    }
+
+    function resetReflection() {
+      isReflectionSubmitted = false;
+      currentReflectionStep = 0;
+      reflectionAnswers = ["", "", "", "", "", ""];
+      localStorage.removeItem('rs_reflection_answers');
+      localStorage.removeItem('rs_reflection_submitted');
+      renderReflectionCard();
+    }
+
+    renderReflectionCard();
 
     // Sync to Google Sheets via Apps Script Web App Endpoint
     async function syncToGoogleSheets(txData) {
