@@ -755,52 +755,8 @@
     <!-- Tab 3: Insight -->
     <section id="tab-insight" class="tab-content">
       <div class="section-title-sm">Analisis Pola Emosi</div>
-      
-      <div class="insight-card" style="background:#FFFFFF; border:var(--rs-border);">
-        <div class="insight-icon" style="background:rgba(52, 199, 89, 0.1); color:var(--rs-income);">
-          <i data-lucide="sparkles"></i>
-        </div>
-        <div class="insight-body">
-          <h4>Threshold Metrik Terpenuhi</h4>
-          <p>Tersimpan 24 transaksi pengeluaran ber-emosi. Pola belanja terdeteksi presisi.</p>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="label">Pengeluaran Berdasarkan Emosi</div>
-        <div style="margin-top:14px;">
-          <div class="bar-item">
-            <div class="bar-label">
-              <span>🔴 Stres (8 tx)</span>
-              <span class="rs-tabular-nums">Rp 1.140.000</span>
-            </div>
-            <div class="bar-track"><div class="bar-fill" style="width:40%; background:var(--rs-red);"></div></div>
-          </div>
-
-          <div class="bar-item">
-            <div class="bar-label">
-              <span>⚪ Bosan (6 tx)</span>
-              <span class="rs-tabular-nums">Rp 712.500</span>
-            </div>
-            <div class="bar-track"><div class="bar-fill" style="width:25%; background:var(--rs-gray);"></div></div>
-          </div>
-
-          <div class="bar-item">
-            <div class="bar-label">
-              <span>🟡 Senang (5 tx)</span>
-              <span class="rs-tabular-nums">Rp 570.000</span>
-            </div>
-            <div class="bar-track"><div class="bar-fill" style="width:20%; background:var(--rs-amber);"></div></div>
-          </div>
-
-          <div class="bar-item">
-            <div class="bar-label">
-              <span>🟠 Cemas (3 tx)</span>
-              <span class="rs-tabular-nums">Rp 285.000</span>
-            </div>
-            <div class="bar-track"><div class="bar-fill" style="width:10%; background:var(--rs-orange);"></div></div>
-          </div>
-        </div>
+      <div id="insight-tab-container">
+        <!-- Dynamic JS Content -->
       </div>
     </section>
 
@@ -1029,8 +985,12 @@
     // Populate Initial Lists
     function populateLists() {
       const recentList = document.getElementById('recent-list');
-      recentList.innerHTML = mockTransactions.slice(0, 3).map(renderTxItem).join('');
+      if (recentList) {
+        recentList.innerHTML = mockTransactions.slice(0, 3).map(renderTxItem).join('');
+      }
       applyFilters();
+      updateSummaryCardTotals();
+      renderInsightTab();
     }
 
     populateLists();
@@ -1438,6 +1398,78 @@
         statValues[0].innerText = `${netBalance >= 0 ? '+' : ''}Rp ${netBalance.toLocaleString('id-ID')}`;
         statValues[1].innerText = `${impulsivePct}% (${impulsiveCount} tx)`;
       }
+    }
+
+    function renderInsightTab() {
+      const container = document.getElementById('insight-tab-container');
+      if (!container) return;
+
+      const emotionStats = {
+        Stres: { count: 0, total: 0, color: 'var(--rs-red)', emoji: '🔴' },
+        Bosan: { count: 0, total: 0, color: 'var(--rs-gray)', emoji: '⚪' },
+        Senang: { count: 0, total: 0, color: 'var(--rs-amber)', emoji: '🟡' },
+        Puas: { count: 0, total: 0, color: 'var(--rs-income)', emoji: '🟢' },
+        Cemas: { count: 0, total: 0, color: 'var(--rs-orange)', emoji: '🟠' },
+        Sedih: { count: 0, total: 0, color: 'var(--rs-blue, #007AFF)', emoji: '🔵' }
+      };
+
+      let totalEmotionTx = 0;
+      let totalEmotionAmount = 0;
+
+      mockTransactions.forEach(tx => {
+        if (tx.jenis === 'Pengeluaran' && tx.emosi && emotionStats[tx.emosi]) {
+          emotionStats[tx.emosi].count++;
+          emotionStats[tx.emosi].total += parseInt(tx.nominal) || 0;
+          totalEmotionTx++;
+          totalEmotionAmount += parseInt(tx.nominal) || 0;
+        }
+      });
+
+      const activeEmotions = Object.keys(emotionStats)
+        .map(key => ({ name: key, ...emotionStats[key] }))
+        .filter(e => e.count > 0)
+        .sort((a, b) => b.total - a.total);
+
+      let barsHtml = '';
+      if (activeEmotions.length === 0) {
+        barsHtml = `<div style="text-align:center; padding:24px 16px; color:var(--rs-text-secondary); font-size:14px;">Belum ada transaksi pengeluaran ber-emosi.</div>`;
+      } else {
+        barsHtml = activeEmotions.map(e => {
+          const pct = totalEmotionAmount > 0 ? Math.round((e.total / totalEmotionAmount) * 100) : 0;
+          return `
+            <div class="bar-item" style="margin-bottom:12px;">
+              <div class="bar-label" style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;">
+                <span>${e.emoji} ${e.name} (${e.count} tx)</span>
+                <span class="rs-tabular-nums" style="font-weight:600;">Rp ${e.total.toLocaleString('id-ID')} (${pct}%)</span>
+              </div>
+              <div class="bar-track" style="height:8px; background:var(--rs-bg-tertiary); border-radius:4px; overflow:hidden;">
+                <div class="bar-fill" style="width:${pct}%; height:100%; background:${e.color}; transition:width 0.3s ease;"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      container.innerHTML = `
+        <div class="insight-card" style="background:#FFFFFF; border:var(--rs-border); margin-bottom:16px;">
+          <div class="insight-icon" style="background:rgba(52, 199, 89, 0.1); color:var(--rs-income);">
+            <i data-lucide="sparkles"></i>
+          </div>
+          <div class="insight-body">
+            <h4 style="font-size:15px; font-weight:700;">Threshold Metrik ${totalEmotionTx > 0 ? 'Terpenuhi' : 'Belum Ada Data'}</h4>
+            <p style="font-size:13px; color:var(--rs-text-secondary);">Tersimpan ${totalEmotionTx} transaksi pengeluaran ber-emosi.</p>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <div class="label">Pengeluaran Berdasarkan Emosi</div>
+          <div style="margin-top:14px;">
+            ${barsHtml}
+          </div>
+        </div>
+      `;
+
+      lucide.createIcons();
     }
 
     // Initial Profile Setup on Load
