@@ -1489,6 +1489,12 @@
       document.getElementById('profile-modal').classList.remove('active');
     }
 
+    function renderProfileContent() {
+      const container = document.getElementById('profile-content');
+      const avatarBtnText = document.getElementById('user-avatar-text');
+      if (!container || !avatarBtnText) return;
+      
+      const savedScriptUrl = localStorage.getItem('rs_google_script_url') || '';
       const hasPin = !!localStorage.getItem('rs_pin_hash');
       const pendingQueueCount = getPendingQueue().length;
       
