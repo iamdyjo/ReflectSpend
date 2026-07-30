@@ -888,12 +888,16 @@
           <div class="stat-value rs-tabular-nums" id="dashboard-total-balance" style="color:var(--rs-income)">+Rp 0</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Transaksi Impulsif</div>
-          <div class="stat-value rs-tabular-nums" id="dashboard-impulsive-stat" style="color:var(--rs-warning)">0% (0 tx)</div>
+          <div class="stat-label">Mindful Streak</div>
+          <div class="stat-value rs-tabular-nums" id="dashboard-habit-streak" style="color:var(--rs-income)">🔥 0 Hari</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Dana Impulsif</div>
           <div class="stat-value rs-tabular-nums" id="dashboard-impulsive-loss" style="color:var(--rs-expense)">Rp 0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Dana Hemat</div>
+          <div class="stat-value rs-tabular-nums" id="dashboard-saved-vault" style="color:var(--rs-income)">🎉 Rp 0</div>
         </div>
       </div>
 
@@ -1100,7 +1104,9 @@
           <button type="button" class="pin-key-btn back" onclick="backspacePinKey()">⌫</button>
         </div>
         <div id="pin-error-msg" style="color:var(--rs-expense); font-size:13px; margin-top:16px; height:20px; font-weight:600;"></div>
-      </div>
+    <!-- Real-Time Network Connection Toast -->
+    <div id="network-status-toast" style="position:fixed; bottom:70px; left:50%; transform:translateX(-50%); background:var(--rs-bg-secondary); border:var(--rs-border); padding:8px 16px; border-radius:9999px; font-size:12px; font-weight:600; font-family:var(--rs-font-mono); box-shadow:0 4px 12px rgba(0,0,0,0.1); display:none; z-index:90; align-items:center; gap:6px;">
+      <span id="network-toast-icon">🟢</span> <span id="network-toast-text">Online</span>
     </div>
 
   </div>
@@ -1563,7 +1569,16 @@
           `Tarik napas dalam-dalam... Apakah pembelian ini memenuhi kebutuhan sejati atau sekadar mengobati emosi sesaat (${selectedEmosi})?\n\n` +
           `Klik OK jika tetap ingin menyimpan, atau Cancel untuk memikirkannya kembali.`
         );
-        if (!confirmSave) return;
+        if (!confirmSave) {
+          // User avoided impulsive transaction! Add to Impulsive Savings Vault
+          let savedTotal = parseInt(localStorage.getItem('rs_impulsive_saved_total')) || 0;
+          savedTotal += nominal;
+          localStorage.setItem('rs_impulsive_saved_total', savedTotal);
+          updateSummaryCardTotals();
+          closeModal();
+          alert(`🎉 Luar biasa! Kamu berhasil menghemat Rp ${nominal.toLocaleString('id-ID')} dan memasukkannya ke Dana Hemat Impulsif!`);
+          return;
+        }
       }
 
       const kategori = document.getElementById('tx-kategori').value;
@@ -1586,6 +1601,7 @@
 
       mockTransactions.unshift(newTx);
       saveToLocalStorage();
+      updateHabitStreak();
       populateLists();
       closeModal();
 
@@ -1998,6 +2014,14 @@
       const impulsiveLossEl = document.getElementById('dashboard-impulsive-loss');
       if (impulsiveLossEl) impulsiveLossEl.innerText = `Rp ${impulsiveLossTotal.toLocaleString('id-ID')}`;
 
+      const savedVaultEl = document.getElementById('dashboard-saved-vault');
+      const savedTotal = parseInt(localStorage.getItem('rs_impulsive_saved_total')) || 0;
+      if (savedVaultEl) savedVaultEl.innerText = `🎉 Rp ${savedTotal.toLocaleString('id-ID')}`;
+
+      const streakEl = document.getElementById('dashboard-habit-streak');
+      const streakData = JSON.parse(localStorage.getItem('rs_habit_streak')) || { count: 0 };
+      if (streakEl) streakEl.innerText = `🔥 ${streakData.count || 0} Hari`;
+
       const subtextEl = document.getElementById('dashboard-expense-subtext');
       if (subtextEl) subtextEl.innerText = `${expenseCount} pengeluaran bulan ini · Rasio Arus Kas: ${cashFlowRatio}% dari Pemasukan`;
 
@@ -2234,6 +2258,77 @@
 
       lucide.createIcons();
     }
+
+    // Mindful Habit Streak Tracker
+    function updateHabitStreak() {
+      const today = new Date().toISOString().split('T')[0];
+      let streakData = JSON.parse(localStorage.getItem('rs_habit_streak')) || { lastDate: '', count: 0 };
+      
+      if (streakData.lastDate === today) return;
+      
+      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+      if (streakData.lastDate === yesterday) {
+        streakData.count += 1;
+      } else {
+        streakData.count = 1;
+      }
+      streakData.lastDate = today;
+      localStorage.setItem('rs_habit_streak', JSON.stringify(streakData));
+    }
+
+    // Keyboard Shortcuts (Hotkeys)
+    function setupKeyboardShortcuts() {
+      window.addEventListener('keydown', (e) => {
+        const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+        const isInputActive = ['input', 'textarea', 'select'].includes(activeTag);
+
+        if (e.key === 'Escape') {
+          closeModal();
+          closeProfileModal();
+          return;
+        }
+
+        if (isInputActive) return;
+
+        if (e.key === 'n' || e.key === 'N' || e.key === '+') {
+          e.preventDefault();
+          openModal();
+        } else if (e.key === '1') {
+          switchTab('beranda');
+        } else if (e.key === '2') {
+          switchTab('habit');
+        } else if (e.key === '3') {
+          switchTab('insight');
+        } else if (e.key === '4') {
+          switchTab('refleksi');
+        }
+      });
+    }
+
+    // Real-time Network Connection Listener
+    function updateNetworkStatusToast() {
+      const toast = document.getElementById('network-status-toast');
+      const icon = document.getElementById('network-toast-icon');
+      const text = document.getElementById('network-toast-text');
+      if (!toast || !icon || !text) return;
+
+      if (!navigator.onLine) {
+        icon.innerText = '🟠';
+        text.innerText = 'Offline — Mode Penyimpanan Lokal Aktif';
+        toast.style.display = 'flex';
+      } else {
+        icon.innerText = '🟢';
+        text.innerText = 'Online — Terhubung ke Internet';
+        toast.style.display = 'flex';
+        setTimeout(() => {
+          if (navigator.onLine) toast.style.display = 'none';
+        }, 3000);
+      }
+    }
+
+    window.addEventListener('online', updateNetworkStatusToast);
+    window.addEventListener('offline', updateNetworkStatusToast);
+    setupKeyboardShortcuts();
 
     // Initial Profile Setup & App Lock Check on Load
     renderProfileContent();
