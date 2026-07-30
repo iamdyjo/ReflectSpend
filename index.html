@@ -816,20 +816,25 @@
 
     .pin-keypad-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, 64px);
+      justify-content: center;
       gap: 16px;
-      width: 100%;
-      max-width: 280px;
       margin: 0 auto;
     }
 
     .pin-key-btn {
-      width: 64px;
-      height: 64px;
-      aspect-ratio: 1 / 1;
-      box-sizing: border-box;
-      margin: 0 auto;
-      border-radius: 50%;
+      width: 64px !important;
+      height: 64px !important;
+      min-width: 64px !important;
+      min-height: 64px !important;
+      max-width: 64px !important;
+      max-height: 64px !important;
+      border-radius: 50% !important;
+      padding: 0 !important;
+      margin: 0 auto !important;
+      box-sizing: border-box !important;
+      aspect-ratio: 1 / 1 !important;
+      overflow: hidden !important;
       border: 1px solid var(--rs-border-default);
       background-color: var(--rs-bg-secondary);
       color: var(--rs-text-primary);
@@ -840,8 +845,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      justify-self: center;
-      align-self: center;
       transition: background-color 0.12s ease, transform 0.08s ease;
     }
 
@@ -853,11 +856,11 @@
     .pin-key-btn.clear,
     .pin-key-btn.back {
       font-family: var(--rs-font-family);
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
       color: var(--rs-text-secondary);
-      border: none;
-      background: none;
+      border: none !important;
+      background: none !important;
     }
 
     @keyframes pinShake {
