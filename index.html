@@ -379,8 +379,8 @@
     .btn-primary {
       width: 100%;
       height: 48px;
-      background-color: var(--rs-color-charcoal-900);
-      color: #FFFFFF;
+      background-color: var(--rs-btn-primary-bg);
+      color: var(--rs-btn-primary-text);
       border: none;
       border-radius: var(--rs-radius-sm);
       font-size: 15px;
@@ -395,7 +395,7 @@
     }
 
     .btn-primary:hover {
-      background-color: #333333;
+      opacity: 0.9;
     }
 
     .btn-primary:active {
@@ -428,7 +428,7 @@
     .segment-btn:focus-visible,
     .btn-close:focus-visible,
     .form-control:focus-visible {
-      outline: 2px solid var(--rs-color-charcoal-900);
+      outline: 2px solid var(--rs-text-primary);
       outline-offset: 2px;
     }
 
@@ -441,7 +441,7 @@
       width: 100%;
       max-width: 640px;
       height: 60px;
-      background-color: rgba(251, 251, 250, 0.95);
+      background-color: var(--rs-bg-primary);
       backdrop-filter: blur(12px);
       border-top: var(--rs-border);
       display: grid;
@@ -468,7 +468,7 @@
     }
 
     .nav-item.active {
-      color: var(--rs-color-charcoal-900);
+      color: var(--rs-text-primary);
       font-weight: 600;
     }
 
@@ -482,8 +482,8 @@
     }
 
     .nav-item.active svg {
-      stroke: var(--rs-color-charcoal-900);
-      color: var(--rs-color-charcoal-900);
+      stroke: var(--rs-text-primary);
+      color: var(--rs-text-primary);
     }
 
     /* Floating Action Button (FAB) */
@@ -494,10 +494,10 @@
       width: 52px;
       height: 52px;
       border-radius: 50%;
-      background-color: var(--rs-color-charcoal-900);
-      color: #FFFFFF;
+      background-color: var(--rs-btn-primary-bg);
+      color: var(--rs-btn-primary-text);
       border: none;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -513,7 +513,7 @@
     }
 
     .fab-btn:hover {
-      background-color: #333333;
+      opacity: 0.9;
     }
 
     .fab-btn:active {
@@ -527,7 +527,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: rgba(17, 17, 17, 0.35);
+      background-color: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(4px);
       z-index: 50;
       display: none;
@@ -606,7 +606,7 @@
 
     .form-control:focus {
       outline: none;
-      border-color: var(--rs-color-charcoal-900);
+      border-color: var(--rs-border-focus);
     }
 
     /* Segmented Control (Choice Chips C3) */
@@ -633,8 +633,8 @@
     }
 
     .segment-btn.active {
-      background-color: var(--rs-color-charcoal-900);
-      color: #FFFFFF;
+      background-color: var(--rs-btn-primary-bg);
+      color: var(--rs-btn-primary-text);
       font-weight: 600;
     }
 
@@ -673,9 +673,9 @@
     }
 
     .chip.active {
-      background-color: var(--rs-color-charcoal-900);
-      border-color: var(--rs-color-charcoal-900);
-      color: #FFFFFF;
+      background-color: var(--rs-btn-primary-bg);
+      border-color: var(--rs-btn-primary-bg);
+      color: var(--rs-btn-primary-text);
       font-weight: 600;
     }
 
@@ -1636,8 +1636,8 @@
       }
 
       container.innerHTML = `
-        <div class="insight-card" style="background:#FFFFFF; border:var(--rs-border); margin-bottom:16px;">
-          <div class="insight-icon" style="background:rgba(52, 199, 89, 0.1); color:var(--rs-income);">
+        <div class="insight-card" style="background:var(--rs-bg-primary); border:var(--rs-border); margin-bottom:16px;">
+          <div class="insight-icon" style="background:var(--rs-pastel-green-bg); color:var(--rs-income);">
             <i data-lucide="sparkles"></i>
           </div>
           <div class="insight-body">
