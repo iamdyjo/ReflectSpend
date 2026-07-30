@@ -1735,6 +1735,12 @@
       const container = document.getElementById('insight-tab-container');
       if (!container) return;
 
+      const expenseTxs = mockTransactions.filter(tx => tx.jenis === 'Pengeluaran');
+      const totalExpenseCount = expenseTxs.length;
+      const impulsiveTxs = expenseTxs.filter(tx => !tx.planned);
+      const impulsiveCount = impulsiveTxs.length;
+      const impulsivePct = totalExpenseCount > 0 ? Math.round((impulsiveCount / totalExpenseCount) * 100) : 0;
+
       const emotionStats = {
         Stres: { count: 0, total: 0, color: 'var(--rs-red)', dotClass: 'stres' },
         Bosan: { count: 0, total: 0, color: 'var(--rs-gray)', dotClass: 'bosan' },
@@ -1746,6 +1752,7 @@
 
       let totalEmotionTx = 0;
       let totalEmotionAmount = 0;
+      let negativeCount = 0;
 
       mockTransactions.forEach(tx => {
         if (tx.jenis === 'Pengeluaran' && tx.emosi && emotionStats[tx.emosi]) {
@@ -1753,17 +1760,57 @@
           emotionStats[tx.emosi].total += parseInt(tx.nominal) || 0;
           totalEmotionTx++;
           totalEmotionAmount += parseInt(tx.nominal) || 0;
+
+          if (['Stres', 'Bosan', 'Cemas', 'Sedih'].includes(tx.emosi)) {
+            negativeCount++;
+          }
         }
       });
+
+      const negativePct = totalEmotionTx > 0 ? Math.round((negativeCount / totalEmotionTx) * 100) : 0;
+
+      // Intentionality Index Score (0-100)
+      const intentionalityScore = totalExpenseCount === 0 ? 100 : Math.max(0, Math.min(100, Math.round(100 - (impulsivePct * 0.5 + negativePct * 0.5))));
+      
+      let scoreBadge = '';
+      let scoreAdvice = '';
+      if (intentionalityScore >= 80) {
+        scoreBadge = `<span style="color:var(--rs-income); font-weight:600;">Sangat Intentional (Sangat Sehat)</span>`;
+        scoreAdvice = `Pola pengeluaranmu sangat terencana dengan dorongan impulsif yang minimal. Pertahankan kesadaran ini!`;
+      } else if (intentionalityScore >= 60) {
+        scoreBadge = `<span style="color:var(--rs-warning); font-weight:600;">Kesadaran Baik (Sehat)</span>`;
+        scoreAdvice = `Keputusan keuanganmu mayoritas sehat, namun terdeteksi beberapa transaksi terpicu emosi atau tidak direncanakan.`;
+      } else {
+        scoreBadge = `<span style="color:var(--rs-expense); font-weight:600;">Rentan Impulsif (Dibutuhkan Jeda)</span>`;
+        scoreAdvice = `Terdeteksi tingkat pengeluaran impulsif & emosional yang tinggi. Gunakan jeda 5 menit sebelum checkout saat tertekan.`;
+      }
 
       const activeEmotions = Object.keys(emotionStats)
         .map(key => ({ name: key, ...emotionStats[key] }))
         .filter(e => e.count > 0)
         .sort((a, b) => b.total - a.total);
 
+      const topEmotion = activeEmotions.length > 0 ? activeEmotions[0] : null;
+
+      // Psychological Coping Advice Generator
+      let copingAdvice = '';
+      if (!topEmotion) {
+        copingAdvice = `Sertakan catatan emosi pada setiap pengeluaran untuk mengaktifkan analisis strategi koping psikologis personal.`;
+      } else if (topEmotion.name === 'Stres') {
+        copingAdvice = `<strong>Strategi Koping Stres:</strong> Terapkan <em>'Aturan 24 Jam'</em>. Simpan barang di keranjang belanja tanpa checkout. Jika setelah 24 jam keinginan masih ada, baru lakukan evaluasi ulang.`;
+      } else if (topEmotion.name === 'Bosan') {
+        copingAdvice = `<strong>Strategi Koping Bosan:</strong> Alihkan pencarian dorongan dopamine dari belanja online ke aktivitas bebas biaya (seperti berjalan kaki 10 menit atau membaca 2 halaman buku).`;
+      } else if (topEmotion.name === 'Cemas') {
+        copingAdvice = `<strong>Strategi Koping Cemas:</strong> Tuliskan kecemasan finansialmu di Refleksi Mingguan. Rasa cemas membutuhkan kepastian dan struktur, bukan pembelian barang baru.`;
+      } else if (topEmotion.name === 'Senang' || topEmotion.name === 'Puas') {
+        copingAdvice = `<strong>Pola Keputusan Sehat:</strong> Emosi dominanmu adalah <strong>${topEmotion.name}</strong>. Pertahankan alokasi anggaran fleksibel untuk merayakan pencapaian tanpa mengganggu tabungan.`;
+      } else {
+        copingAdvice = `<strong>Strategi Kesadaran Emosi:</strong> Emosi dominanmu adalah <strong>${topEmotion.name}</strong>. Mengakui emosi ini secara sadar membantu mencegah kebocoran finansial.`;
+      }
+
       let barsHtml = '';
       if (activeEmotions.length === 0) {
-        barsHtml = `<div style="text-align:center; padding:24px 16px; color:var(--rs-text-secondary); font-size:14px;">Belum ada transaksi pengeluaran ber-emosi.</div>`;
+        barsHtml = `<div style="text-align:center; padding:24px 16px; color:var(--rs-text-secondary); font-size:14px;">Belum ada transaksi pengeluaran ber-emosi terdaftar.</div>`;
       } else {
         barsHtml = activeEmotions.map(e => {
           const pct = totalEmotionAmount > 0 ? Math.round((e.total / totalEmotionAmount) * 100) : 0;
@@ -1782,20 +1829,37 @@
       }
 
       container.innerHTML = `
-        <div class="insight-card" style="background:var(--rs-bg-primary); border:var(--rs-border); margin-bottom:16px;">
-          <div class="insight-icon" style="background:var(--rs-pastel-green-bg); color:var(--rs-income);">
-            <i data-lucide="sparkles"></i>
+        <!-- Card 1: Skor Indeks Intentionality Finansial & Mental -->
+        <div class="summary-card" style="margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div class="label">Skor Indeks Intentionality Finansial</div>
+            <span class="rs-tabular-nums" style="font-size:18px; font-weight:700; font-family:var(--rs-font-mono);">${intentionalityScore}/100</span>
           </div>
-          <div class="insight-body">
-            <h4 style="font-size:15px; font-weight:700;">Threshold Metrik ${totalEmotionTx > 0 ? 'Terpenuhi' : 'Belum Ada Data'}</h4>
-            <p style="font-size:13px; color:var(--rs-text-secondary);">Tersimpan ${totalEmotionTx} transaksi pengeluaran ber-emosi.</p>
+          
+          <div style="height:8px; background:var(--rs-bg-tertiary); border-radius:4px; overflow:hidden; margin-bottom:10px;">
+            <div style="width:${intentionalityScore}%; height:100%; background:${intentionalityScore >= 80 ? 'var(--rs-income)' : (intentionalityScore >= 60 ? 'var(--rs-warning)' : 'var(--rs-expense)')}; transition:width 0.4s ease;"></div>
+          </div>
+          
+          <div style="font-size:13px; margin-bottom:4px;">Status: ${scoreBadge}</div>
+          <div style="font-size:12px; color:var(--rs-text-secondary); line-height:1.4;">${scoreAdvice}</div>
+        </div>
+
+        <!-- Card 2: Matriks Pengeluaran Berdasarkan Emosi -->
+        <div class="summary-card" style="margin-bottom:16px;">
+          <div class="label">Matriks Pengeluaran Berdasarkan Emosi</div>
+          <div style="margin-top:14px;">
+            ${barsHtml}
           </div>
         </div>
 
-        <div class="summary-card">
-          <div class="label">Pengeluaran Berdasarkan Emosi</div>
-          <div style="margin-top:14px;">
-            ${barsHtml}
+        <!-- Card 3: Rekomendasi Koping Psikologi Finansial -->
+        <div class="insight-card" style="background:var(--rs-bg-primary); border:var(--rs-border);">
+          <div class="insight-icon" style="background:var(--rs-pastel-blue-bg); color:var(--rs-pastel-blue-text);">
+            <i data-lucide="shield-check"></i>
+          </div>
+          <div class="insight-body">
+            <h4 style="font-size:15px; font-weight:700; margin-bottom:4px;">Rekomendasi Psikologi Finansial</h4>
+            <p style="font-size:13px; color:var(--rs-text-primary); line-height:1.4;">${copingAdvice}</p>
           </div>
         </div>
       `;
