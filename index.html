@@ -924,7 +924,7 @@
         </div>
         <div class="stat-card">
           <div class="stat-label">Dana Impulsif</div>
-          <div class="stat-value rs-tabular-nums" id="dashboard-impulsive-loss" style="color:var(--rs-expense)">Rp 0</div>
+          <div class="stat-value rs-tabular-nums" id="dashboard-impulsive-loss" style="color:var(--rs-expense)">-Rp 0</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Dana Hemat</div>
@@ -2048,7 +2048,7 @@
       if (impulsiveEl) impulsiveEl.innerText = `${impulsivePct}% (${impulsiveCount} tx)`;
 
       const impulsiveLossEl = document.getElementById('dashboard-impulsive-loss');
-      if (impulsiveLossEl) impulsiveLossEl.innerText = `Rp ${impulsiveLossTotal.toLocaleString('id-ID')}`;
+      if (impulsiveLossEl) impulsiveLossEl.innerText = `-Rp ${impulsiveLossTotal.toLocaleString('id-ID')}`;
 
       const savedVaultEl = document.getElementById('dashboard-saved-vault');
       const savedTotal = parseInt(localStorage.getItem('rs_impulsive_saved_total')) || 0;
