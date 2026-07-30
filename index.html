@@ -366,38 +366,48 @@
       line-height: 1.4;
     }
 
-    /* Buttons (C5) */
+    /* Buttons (C5) — Minimalist Editorial */
     .btn-primary {
       width: 100%;
-      height: 50px;
-      background-color: var(--rs-accent);
+      height: 48px;
+      background-color: var(--rs-color-charcoal-900);
       color: #FFFFFF;
       border: none;
-      border-radius: var(--rs-radius-md);
-      font-size: 16px;
+      border-radius: var(--rs-radius-sm);
+      font-size: 15px;
       font-weight: 600;
+      letter-spacing: -0.01em;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: opacity 0.15s ease;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #333333;
     }
 
     .btn-primary:active {
-      opacity: 0.85;
+      transform: scale(0.98);
     }
 
     .btn-secondary {
-      height: 44px;
+      height: 42px;
       background-color: var(--rs-bg-secondary);
       color: var(--rs-text-primary);
       border: var(--rs-border);
-      border-radius: var(--rs-radius-md);
-      font-size: 14px;
+      border-radius: var(--rs-radius-sm);
+      font-size: 13px;
       font-weight: 500;
-      padding: 0 16px;
+      padding: 0 14px;
       cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--rs-bg-tertiary);
     }
 
     /* Focus-Visible Outline Ring for Accessibility (Keyboard Navigation) */
@@ -409,7 +419,7 @@
     .segment-btn:focus-visible,
     .btn-close:focus-visible,
     .form-control:focus-visible {
-      outline: 2px solid var(--rs-accent);
+      outline: 2px solid var(--rs-color-charcoal-900);
       outline-offset: 2px;
     }
 
@@ -421,8 +431,8 @@
       transform: translateX(-50%);
       width: 100%;
       max-width: 640px;
-      height: 64px;
-      background-color: rgba(255, 255, 255, 0.92);
+      height: 60px;
+      background-color: rgba(251, 251, 250, 0.95);
       backdrop-filter: blur(12px);
       border-top: var(--rs-border);
       display: grid;
@@ -445,16 +455,17 @@
       border: none;
       cursor: pointer;
       height: 100%;
+      transition: color 0.15s ease;
     }
 
     .nav-item.active {
-      color: var(--rs-accent);
+      color: var(--rs-color-charcoal-900);
       font-weight: 600;
     }
 
     .nav-item svg {
-      width: 20px;
-      height: 20px;
+      width: 19px;
+      height: 19px;
       stroke: currentColor;
       fill: none;
       flex-shrink: 0;
@@ -462,28 +473,28 @@
     }
 
     .nav-item.active svg {
-      stroke: var(--rs-accent);
-      color: var(--rs-accent);
+      stroke: var(--rs-color-charcoal-900);
+      color: var(--rs-color-charcoal-900);
     }
 
     /* Floating Action Button (FAB) */
     .fab-btn {
       position: fixed;
-      bottom: 76px;
+      bottom: 74px;
       right: calc(50% - 300px + 20px);
-      width: 56px;
-      height: 56px;
+      width: 52px;
+      height: 52px;
       border-radius: 50%;
-      background-color: var(--rs-accent);
+      background-color: var(--rs-color-charcoal-900);
       color: #FFFFFF;
       border: none;
-      box-shadow: 0 4px 14px rgba(0, 122, 255, 0.35);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       z-index: 40;
-      transition: transform 0.15s ease;
+      transition: transform 0.15s ease, background-color 0.15s ease;
     }
 
     @media (max-width: 640px) {
@@ -492,8 +503,12 @@
       }
     }
 
+    .fab-btn:hover {
+      background-color: #333333;
+    }
+
     .fab-btn:active {
-      transform: scale(0.92);
+      transform: scale(0.94);
     }
 
     /* Modal Form Overlay */
@@ -503,7 +518,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: rgba(0, 0, 0, 0.4);
+      background-color: rgba(17, 17, 17, 0.35);
       backdrop-filter: blur(4px);
       z-index: 50;
       display: none;
@@ -522,9 +537,10 @@
       background-color: var(--rs-bg-primary);
       border-top-left-radius: var(--rs-radius-sheet);
       border-top-right-radius: var(--rs-radius-sheet);
+      border-top: var(--rs-border);
       padding: 24px 20px 32px 20px;
       overflow-y: auto;
-      animation: slideUp 0.25s cubic-bezier(0.1, 0.9, 0.2, 1);
+      animation: slideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @keyframes slideUp {
@@ -540,8 +556,9 @@
     }
 
     .modal-title {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
+      letter-spacing: -0.01em;
     }
 
     .btn-close {
@@ -559,44 +576,46 @@
 
     .form-label {
       display: block;
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 13px;
+      font-weight: 600;
       margin-bottom: 6px;
       color: var(--rs-text-primary);
     }
 
     .form-control {
       width: 100%;
-      height: 46px;
-      padding: 0 14px;
+      height: 44px;
+      padding: 0 12px;
       border: var(--rs-border);
-      border-radius: var(--rs-radius-md);
-      font-size: 16px;
+      border-radius: var(--rs-radius-sm);
+      font-size: 15px;
       background-color: var(--rs-bg-primary);
       font-family: inherit;
       color: var(--rs-text-primary);
+      transition: border-color 0.15s ease;
     }
 
     .form-control:focus {
       outline: none;
-      border-color: var(--rs-border-focus);
+      border-color: var(--rs-color-charcoal-900);
     }
 
     /* Segmented Control (Choice Chips C3) */
     .segmented-control {
       display: flex;
       background-color: var(--rs-bg-tertiary);
-      border-radius: 8px;
+      border: var(--rs-border);
+      border-radius: var(--rs-radius-sm);
       padding: 3px;
       gap: 2px;
     }
 
     .segment-btn {
       flex: 1;
-      height: 36px;
+      height: 34px;
       border: none;
       background: none;
-      border-radius: 6px;
+      border-radius: 4px;
       font-size: 13px;
       font-weight: 500;
       color: var(--rs-text-secondary);
@@ -605,10 +624,9 @@
     }
 
     .segment-btn.active {
-      background-color: #FFFFFF;
-      color: var(--rs-text-primary);
+      background-color: var(--rs-color-charcoal-900);
+      color: #FFFFFF;
       font-weight: 600;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
     /* Choice Chips Grid */
@@ -619,32 +637,36 @@
     }
 
     .chip {
-      height: 38px;
-      padding: 0 14px;
-      border-radius: var(--rs-radius-sm);
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 9999px;
       border: var(--rs-border);
       background-color: var(--rs-bg-primary);
-      font-size: 13px;
-      font-weight: 500;
+      font-family: var(--rs-font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
       color: var(--rs-text-secondary);
       display: flex;
       align-items: center;
       gap: 6px;
       cursor: pointer;
+      transition: all 0.15s ease;
     }
 
     .chip svg {
-      width: 14px;
-      height: 14px;
+      width: 13px;
+      height: 13px;
       stroke: currentColor;
       fill: none;
       flex-shrink: 0;
     }
 
     .chip.active {
-      background-color: rgba(0, 122, 255, 0.08);
-      border-color: var(--rs-accent);
-      color: var(--rs-accent);
+      background-color: var(--rs-color-charcoal-900);
+      border-color: var(--rs-color-charcoal-900);
+      color: #FFFFFF;
       font-weight: 600;
     }
 
@@ -657,24 +679,26 @@
     }
 
     .scale-value-badge {
-      font-size: 24px;
+      font-family: var(--rs-font-mono);
+      font-size: 22px;
       font-weight: 700;
-      color: var(--rs-accent);
+      color: var(--rs-color-charcoal-900);
     }
 
     .range-slider {
       width: 100%;
-      height: 6px;
+      height: 5px;
       border-radius: 3px;
       background: var(--rs-bg-tertiary);
-      accent-color: var(--rs-accent);
+      accent-color: var(--rs-color-charcoal-900);
       cursor: pointer;
     }
 
     .scale-labels {
       display: flex;
       justify-content: space-between;
-      font-size: 12px;
+      font-family: var(--rs-font-mono);
+      font-size: 11px;
       color: var(--rs-text-secondary);
       margin-top: 6px;
     }
@@ -692,15 +716,15 @@
     }
 
     .bar-track {
-      height: 10px;
+      height: 8px;
       background-color: var(--rs-bg-tertiary);
-      border-radius: 5px;
+      border-radius: 4px;
       overflow: hidden;
     }
 
     .bar-fill {
       height: 100%;
-      border-radius: 5px;
+      border-radius: 4px;
       transition: width 0.4s ease;
     }
   </style>
