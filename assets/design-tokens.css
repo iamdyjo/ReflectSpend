@@ -12,24 +12,27 @@
   --rs-color-charcoal-600: #71717A;
   --rs-color-charcoal-900: #18181B;
 
-  /* Apple & Notion Semantic Palette */
-  --rs-blue: #007AFF;
-  --rs-green: #34C759;
-  --rs-red: #FF3B30;
-  --rs-orange: #FF9500;
-  --rs-amber: #FFB800;
-  --rs-indigo: #5E5CE6;
-  --rs-gray: #787774;
+  /* Attractive Modern Semantic Palette (Curated Vibrant Pastels) */
+  --rs-blue: #0284C7;
+  --rs-green: #10B981;
+  --rs-red: #F43F5E;
+  --rs-orange: #F97316;
+  --rs-amber: #F59E0B;
+  --rs-indigo: #6366F1;
+  --rs-purple: #8B5CF6;
+  --rs-gray: #64748B;
 
-  /* Minimalist UI Muted Pastels */
-  --rs-pastel-red-bg: #FDEBEC;
-  --rs-pastel-red-text: #9F2F2D;
-  --rs-pastel-green-bg: #EDF3EC;
-  --rs-pastel-green-text: #346538;
-  --rs-pastel-yellow-bg: #FBF3DB;
-  --rs-pastel-yellow-text: #956400;
-  --rs-pastel-blue-bg: #E1F3FE;
-  --rs-pastel-blue-text: #1F6C9F;
+  /* Vibrant & Attractive Muted Pastels */
+  --rs-pastel-red-bg: #FFE4E6;
+  --rs-pastel-red-text: #9F1239;
+  --rs-pastel-green-bg: #D1FAE5;
+  --rs-pastel-green-text: #065F46;
+  --rs-pastel-yellow-bg: #FEF3C7;
+  --rs-pastel-yellow-text: #92400E;
+  --rs-pastel-blue-bg: #E0F2FE;
+  --rs-pastel-blue-text: #075985;
+  --rs-pastel-purple-bg: #F3E8FF;
+  --rs-pastel-purple-text: #5B21B6;
 
   /* Button Theme Aliases */
   --rs-btn-primary-bg: var(--rs-color-charcoal-900);
@@ -47,20 +50,20 @@
   --rs-text-secondary: var(--rs-color-charcoal-600);
   --rs-text-tertiary: var(--rs-color-charcoal-400);
 
-  /* Financial Semantics */
-  --rs-income: var(--rs-pastel-green-text);
-  --rs-expense: var(--rs-pastel-red-text);
-  --rs-transfer: var(--rs-gray);
-  --rs-warning: var(--rs-pastel-yellow-text);
+  /* Financial Semantics (Vibrant & Distinct) */
+  --rs-income: #059669;
+  --rs-expense: #E11D48;
+  --rs-transfer: #4F46E5;
+  --rs-warning: #D97706;
   --rs-accent: var(--rs-color-charcoal-900);
 
-  /* Emotion Spectrum */
-  --rs-emotion-senang: var(--rs-amber);
-  --rs-emotion-puas: var(--rs-green);
-  --rs-emotion-stres: var(--rs-red);
-  --rs-emotion-cemas: var(--rs-orange);
-  --rs-emotion-sedih: var(--rs-indigo);
-  --rs-emotion-bosan: var(--rs-gray);
+  /* Emotion Spectrum (Attractive Tailored Hues) */
+  --rs-emotion-senang: #F59E0B;
+  --rs-emotion-puas: #10B981;
+  --rs-emotion-stres: #F43F5E;
+  --rs-emotion-cemas: #F97316;
+  --rs-emotion-sedih: #0284C7;
+  --rs-emotion-bosan: #8B5CF6;
 
   /* Typography System (Calm Geist Sans & Geist Mono Standard) */
   --rs-font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
