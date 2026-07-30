@@ -780,15 +780,9 @@
         </div>
       </div>
 
-      <!-- Insight Card (C6) -->
-      <div class="insight-card">
-        <div class="insight-icon">
-          <i data-lucide="brain"></i>
-        </div>
-        <div class="insight-body">
-          <h4>Insight Emosi Utama</h4>
-          <p>40% pengeluaranmu bulan ini terjadi saat kamu merasa <strong>Stres</strong>. Rata-rata transaksi saat stres Rp 95.000.</p>
-        </div>
+      <!-- Dynamic AI Insight Card (C6) -->
+      <div id="dashboard-ai-insight">
+        <!-- Rendered dynamically by updateSummaryCardTotals() / updateDashboardAIInsight() -->
       </div>
 
       <!-- Recent Transactions -->
@@ -802,9 +796,9 @@
       </div>
     </main>
 
-    <!-- Tab 2: Riwayat -->
+    <!-- Tab 2: Habit & Riwayat -->
     <section id="tab-riwayat" class="tab-content">
-      <div class="section-title-sm">Riwayat & Filter</div>
+      <div class="section-title-sm">Habit & Pola Kebiasaan</div>
       
       <div class="form-group" style="margin-bottom:12px;">
         <input type="text" class="form-control" placeholder="Cari transaksi atau jurnal..." onkeyup="filterHistory(this.value)">
@@ -853,8 +847,8 @@
         <span>Beranda</span>
       </button>
       <button class="nav-item" role="tab" aria-selected="false" onclick="switchTab('riwayat')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
-        <span>Riwayat</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2.1l4 4-4 4"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M7 21.9l-4-4 4-4"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+        <span>Habit</span>
       </button>
       <button class="nav-item" role="tab" aria-selected="false" onclick="switchTab('insight')">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
@@ -1583,6 +1577,103 @@
 
       const subtextEl = document.getElementById('dashboard-expense-subtext');
       if (subtextEl) subtextEl.innerText = `${expenseCount} pengeluaran terdaftar bulan ini`;
+
+      updateDashboardAIInsight();
+    }
+
+    // Free AI Emotion Insight Engine & Threshold Metric Indicator
+    function updateDashboardAIInsight() {
+      const insightContainer = document.getElementById('dashboard-ai-insight');
+      if (!insightContainer) return;
+
+      const expenseTxs = mockTransactions.filter(tx => tx.jenis === 'Pengeluaran');
+      const emotionTxs = expenseTxs.filter(tx => tx.emosi);
+      const totalEmotionCount = emotionTxs.length;
+
+      // Threshold metric (15 tx requirement for 100% precision)
+      const thresholdTarget = 15;
+      const isThresholdMet = totalEmotionCount >= thresholdTarget;
+      const thresholdPct = Math.min(100, Math.round((totalEmotionCount / thresholdTarget) * 100));
+
+      if (expenseTxs.length === 0) {
+        insightContainer.innerHTML = `
+          <div class="insight-card">
+            <div class="insight-icon">
+              <i data-lucide="sparkles"></i>
+            </div>
+            <div class="insight-body" style="width:100%;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+                <h4 style="font-size:15px; font-weight:700; margin:0;">AI Insight Emosi Utama</h4>
+                <span style="font-family:var(--rs-font-mono); font-size:10px; font-weight:600; text-transform:uppercase; color:var(--rs-pastel-blue-text); background:var(--rs-pastel-blue-bg); padding:2px 8px; border-radius:9999px; border:1px solid rgba(31,108,159,0.2);">Siap Analisis</span>
+              </div>
+              <p>Belum ada transaksi pengeluaran bulan ini. Catat transaksi pertamamu dengan emosi untuk mengaktifkan AI analisis pola keputusan finansial.</p>
+            </div>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      // Group emotion stats
+      const stats = {};
+      let totalAmount = 0;
+      let impulsiveCount = 0;
+
+      emotionTxs.forEach(tx => {
+        const emo = tx.emosi;
+        const nom = parseInt(tx.nominal) || 0;
+        if (!stats[emo]) stats[emo] = { count: 0, total: 0 };
+        stats[emo].count++;
+        stats[emo].total += nom;
+        totalAmount += nom;
+        if (!tx.planned) impulsiveCount++;
+      });
+
+      const sortedEmotions = Object.keys(stats)
+        .map(key => ({ name: key, count: stats[key].count, total: stats[key].total }))
+        .sort((a, b) => b.total - a.total);
+
+      const topEmotion = sortedEmotions.length > 0 ? sortedEmotions[0] : null;
+      const topPct = topEmotion && totalAmount > 0 ? Math.round((topEmotion.total / totalAmount) * 100) : 0;
+      const avgAmount = topEmotion && topEmotion.count > 0 ? Math.round(topEmotion.total / topEmotion.count) : 0;
+
+      // Intelligent AI Empathetic Narrative Generator
+      let aiNarrative = '';
+      if (!topEmotion) {
+        aiNarrative = `${expenseTxs.length} pengeluaran terdaftar. Sertakan emosi pada transaksi untuk membuka analisis kecerdasan finansial.`;
+      } else if (topEmotion.name === 'Stres') {
+        aiNarrative = `Kecerdasan AI mendeteksi <strong>${topPct}%</strong> pengeluaranmu terpicu emosi <strong>Stres</strong> (rata-rata Rp ${avgAmount.toLocaleString('id-ID')} per tx). Ambil jeda refleksi 5 menit sebelum checkout saat tertekan.`;
+      } else if (topEmotion.name === 'Bosan') {
+        aiNarrative = `AI mencatat <strong>${topPct}%</strong> pengeluaran terjadi karena <strong>Bosan</strong> (rata-rata Rp ${avgAmount.toLocaleString('id-ID')}). Mengalihkan perhatian ke aktivitas non-belanja dapat menekan transaksi impulsif.`;
+      } else if (topEmotion.name === 'Senang' || topEmotion.name === 'Puas') {
+        aiNarrative = `Emosi dominanmu bulan ini adalah <strong>${topEmotion.name}</strong> (${topPct}% pengeluaran). Kesadaran finansialmu tergolong sehat dengan pola keputusan yang intentional.`;
+      } else if (topEmotion.name === 'Cemas' || topEmotion.name === 'Sedih') {
+        aiNarrative = `Pengeluaran terbesarmu terhubung dengan emosi <strong>${topEmotion.name}</strong> (${topPct}%). Mengakui emosi ini adalah langkah pertama menuju ketenangan finansial.`;
+      } else {
+        aiNarrative = `Emosi utama pengeluaranmu adalah <strong>${topEmotion.name}</strong> (${topPct}% total pengeluaran, rata-rata Rp ${avgAmount.toLocaleString('id-ID')}).`;
+      }
+
+      // Threshold Badge HTML
+      const thresholdBadge = isThresholdMet ? 
+        `<span style="font-family:var(--rs-font-mono); font-size:10px; font-weight:600; text-transform:uppercase; color:var(--rs-income); background:var(--rs-pastel-green-bg); padding:2px 8px; border-radius:9999px; border:1px solid rgba(52,199,89,0.2);">✨ Akurasi Tinggi (${totalEmotionCount}/15 tx)</span>` :
+        `<span style="font-family:var(--rs-font-mono); font-size:10px; font-weight:600; text-transform:uppercase; color:var(--rs-pastel-yellow-text); background:var(--rs-pastel-yellow-bg); padding:2px 8px; border-radius:9999px; border:1px solid rgba(149,100,0,0.2);">Akurasi ${thresholdPct}% (${totalEmotionCount}/15 tx)</span>`;
+
+      insightContainer.innerHTML = `
+        <div class="insight-card">
+          <div class="insight-icon">
+            <i data-lucide="brain"></i>
+          </div>
+          <div class="insight-body" style="width:100%;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+              <h4 style="font-size:15px; font-weight:700; margin:0;">AI Insight Emosi Utama</h4>
+              ${thresholdBadge}
+            </div>
+            <p>${aiNarrative}</p>
+          </div>
+        </div>
+      `;
+
+      lucide.createIcons();
     }
 
     function renderInsightTab() {
