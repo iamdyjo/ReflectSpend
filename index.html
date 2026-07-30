@@ -1142,9 +1142,88 @@
 
     renderReflectionCard();
 
+    // Pending Sync Queue Helper Functions
+    function getPendingQueue() {
+      try {
+        return JSON.parse(localStorage.getItem('rs_pending_sync_tx')) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function savePendingQueue(queue) {
+      localStorage.setItem('rs_pending_sync_tx', JSON.stringify(queue));
+    }
+
+    function queueOfflineTransaction(txData) {
+      const queue = getPendingQueue();
+      queue.push(txData);
+      savePendingQueue(queue);
+      console.log('Saved to offline sync queue. Total pending:', queue.length);
+
+      // Register Service Worker Background Sync if supported
+      if ('serviceWorker' in navigator && 'SyncManager' in window) {
+        navigator.serviceWorker.ready.then(reg => {
+          return reg.sync.register('sync-pending-transactions');
+        }).catch(err => console.log('Background Sync registration skipped/failed:', err));
+      }
+    }
+
+    async function processPendingSyncQueue() {
+      if (!navigator.onLine || !GOOGLE_SCRIPT_URL) return;
+
+      const queue = getPendingQueue();
+      if (queue.length === 0) return;
+
+      console.log(`Processing ${queue.length} pending offline transactions...`);
+      const remainingQueue = [];
+
+      for (const txData of queue) {
+        try {
+          await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'add_transaction',
+              ...txData
+            })
+          });
+          console.log('Synced pending transaction to Google Sheets:', txData.kategori);
+        } catch (err) {
+          console.warn('Failed to sync item, keeping in queue:', err);
+          remainingQueue.push(txData);
+        }
+      }
+
+      savePendingQueue(remainingQueue);
+      if (remainingQueue.length === 0) {
+        console.log('All pending offline transactions successfully synced!');
+      }
+    }
+
+    // Listen for Online Event & SW Message to Trigger Sync
+    window.addEventListener('online', () => {
+      console.log('Connection restored! Processing offline queue...');
+      processPendingSyncQueue();
+    });
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'POST_SYNC_PENDING') {
+          processPendingSyncQueue();
+        }
+      });
+    }
+
     // Sync to Google Sheets via Apps Script Web App Endpoint
     async function syncToGoogleSheets(txData) {
       if (!GOOGLE_SCRIPT_URL) return;
+
+      if (!navigator.onLine) {
+        queueOfflineTransaction(txData);
+        return;
+      }
 
       try {
         await fetch(GOOGLE_SCRIPT_URL, {
@@ -1158,7 +1237,8 @@
         });
         console.log('Real-time sync to Google Sheets triggered!');
       } catch (err) {
-        console.warn('Sync to Google Sheets offline / error:', err);
+        console.warn('Sync to Google Sheets offline / error, queueing for background sync:', err);
+        queueOfflineTransaction(txData);
       }
     }
 
@@ -1516,11 +1596,15 @@
     // Initial Profile Setup on Load
     renderProfileContent();
 
-    // Register Service Worker for PWA Offline Support
+    // Register Service Worker for PWA Offline Support & Background Sync
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
+        navigator.serviceWorker.register('./sw.js')
+          .then(() => processPendingSyncQueue())
+          .catch(err => console.log('SW registration failed:', err));
       });
+    } else {
+      window.addEventListener('load', () => processPendingSyncQueue());
     }
   </script>
 </body>
