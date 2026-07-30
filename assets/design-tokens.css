@@ -62,6 +62,7 @@
 
   /* Typography System (Minimalist-UI Standard) */
   --rs-font-family: 'Geist Sans', 'SF Pro Display', 'Switzer', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --rs-font-editorial: 'Newsreader', 'Georgia', serif;
   --rs-font-mono: 'Geist Mono', 'SF Mono', 'JetBrains Mono', monospace;
   
   /* Scale */

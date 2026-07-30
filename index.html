@@ -16,10 +16,10 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="manifest.json">
   
-  <!-- Inter Font from Google Fonts -->
+  <!-- Google Fonts: Inter & Newsreader Editorial Serif -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
   
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -82,8 +82,10 @@
     }
 
     .brand-title {
-      font-size: 18px;
-      font-weight: 700;
+      font-family: var(--rs-font-editorial);
+      font-size: 21px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
       color: var(--rs-text-primary);
       display: flex;
       align-items: center;
@@ -218,6 +220,7 @@
 
     /* Section Header */
     .section-title {
+      font-family: var(--rs-font-editorial);
       font-size: var(--rs-font-title2);
       font-weight: 600;
       letter-spacing: -0.02em;
@@ -228,9 +231,10 @@
     }
 
     .section-title-sm {
-      font-size: var(--rs-font-headline);
+      font-family: var(--rs-font-editorial);
+      font-size: 19px;
       font-weight: 600;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.02em;
       margin-bottom: 12px;
     }
 
@@ -1300,32 +1304,32 @@
     // Category Map per Jenis Transaksi
     const categoryMap = {
       Pengeluaran: [
-        { value: "Makanan & Minuman", text: "🍴 Makanan & Minuman", icon: "utensils" },
-        { value: "Transport", text: "🚗 Transport", icon: "car" },
-        { value: "Belanja", text: "🛍️ Belanja", icon: "shopping-bag" },
-        { value: "Hiburan", text: "🎬 Hiburan", icon: "film" },
-        { value: "Tagihan & Langganan", text: "📄 Tagihan & Langganan", icon: "file-text" },
-        { value: "Kesehatan", text: "🏥 Kesehatan", icon: "heart-pulse" },
-        { value: "Pendidikan", text: "📚 Pendidikan", icon: "graduation-cap" },
-        { value: "Sosial", text: "🎁 Sosial", icon: "gift" },
-        { value: "Lainnya", text: "⚙️ Lainnya", icon: "more-horizontal" }
+        { value: "Makanan & Minuman", text: "Makanan & Minuman", icon: "utensils" },
+        { value: "Transport", text: "Transport", icon: "car" },
+        { value: "Belanja", text: "Belanja", icon: "shopping-bag" },
+        { value: "Hiburan", text: "Hiburan", icon: "film" },
+        { value: "Tagihan & Langganan", text: "Tagihan & Langganan", icon: "file-text" },
+        { value: "Kesehatan", text: "Kesehatan", icon: "heart-pulse" },
+        { value: "Pendidikan", text: "Pendidikan", icon: "graduation-cap" },
+        { value: "Sosial", text: "Sosial", icon: "gift" },
+        { value: "Lainnya", text: "Lainnya", icon: "more-horizontal" }
       ],
       Pemasukan: [
-        { value: "Gaji", text: "💼 Gaji", icon: "briefcase" },
-        { value: "Bonus / THR", text: "🎁 Bonus / THR", icon: "gift" },
-        { value: "Freelance", text: "💻 Freelance", icon: "laptop" },
-        { value: "Penjualan", text: "🏷️ Penjualan", icon: "tag" },
-        { value: "Hadiah", text: "💖 Hadiah", icon: "heart" },
-        { value: "Pengembalian Dana", text: "🔄 Pengembalian Dana", icon: "rotate-ccw" },
-        { value: "Lainnya", text: "⚙️ Lainnya", icon: "more-horizontal" }
+        { value: "Gaji", text: "Gaji", icon: "briefcase" },
+        { value: "Bonus / THR", text: "Bonus / THR", icon: "gift" },
+        { value: "Freelance", text: "Freelance", icon: "laptop" },
+        { value: "Penjualan", text: "Penjualan", icon: "tag" },
+        { value: "Hadiah", text: "Hadiah", icon: "heart" },
+        { value: "Pengembalian Dana", text: "Pengembalian Dana", icon: "rotate-ccw" },
+        { value: "Lainnya", text: "Lainnya", icon: "more-horizontal" }
       ],
       Transfer: [
-        { value: "Transfer Antar Rekening", text: "🔄 Transfer Antar Rekening", icon: "arrow-right-left" },
-        { value: "Top Up E-Wallet", text: "📱 Top Up E-Wallet", icon: "smartphone" },
-        { value: "Tarik Tunai", text: "🏧 Tarik Tunai", icon: "banknote" },
-        { value: "Setor Tunai", text: "🏦 Setor Tunai", icon: "building-bank" },
-        { value: "Investasi / Tabungan", text: "📈 Investasi / Tabungan", icon: "trending-up" },
-        { value: "Lainnya", text: "⚙️ Lainnya", icon: "more-horizontal" }
+        { value: "Transfer Antar Rekening", text: "Transfer Antar Rekening", icon: "arrow-right-left" },
+        { value: "Top Up E-Wallet", text: "Top Up E-Wallet", icon: "smartphone" },
+        { value: "Tarik Tunai", text: "Tarik Tunai", icon: "banknote" },
+        { value: "Setor Tunai", text: "Setor Tunai", icon: "building" },
+        { value: "Investasi / Tabungan", text: "Investasi / Tabungan", icon: "trending-up" },
+        { value: "Lainnya", text: "Lainnya", icon: "more-horizontal" }
       ]
     };
 
@@ -1443,14 +1447,14 @@
         <div class="form-group" style="margin-top:20px;">
           <label class="form-label" style="font-weight:600;">Tema Tampilan</label>
           <div class="segmented-control">
-            <button type="button" class="segment-btn ${currentTheme === 'light' ? 'active' : ''}" onclick="setAppTheme('light')">☀️ Terang</button>
-            <button type="button" class="segment-btn ${currentTheme === 'dark' ? 'active' : ''}" onclick="setAppTheme('dark')">🌙 Gelap</button>
+            <button type="button" class="segment-btn ${currentTheme === 'light' ? 'active' : ''}" onclick="setAppTheme('light')"><i data-lucide="sun" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i>Terang</button>
+            <button type="button" class="segment-btn ${currentTheme === 'dark' ? 'active' : ''}" onclick="setAppTheme('dark')"><i data-lucide="moon" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i>Gelap</button>
           </div>
         </div>
       `;
 
       if (userProfile && userProfile.name) {
-        avatarBtnText.innerHTML = `👤 ${userProfile.name.split(' ')[0]}`;
+        avatarBtnText.innerHTML = `<i data-lucide="user" style="width:14px; height:14px;"></i> <span>${userProfile.name.split(' ')[0]}</span>`;
         container.innerHTML = `
           <div class="summary-card" style="margin-bottom:16px; border:var(--rs-border); background:var(--rs-bg-secondary);">
             <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
@@ -1470,13 +1474,13 @@
           <div class="form-group" style="margin-top:20px; border-top:var(--rs-border); padding-top:16px;">
             <label class="form-label" style="color:var(--rs-expense); font-weight:600;">Area Bahaya (Data)</label>
             <p style="font-size:13px; color:var(--rs-text-secondary); margin-bottom:12px;">Reset akan menghapus seluruh riwayat transaksi & refleksi lokal untuk memulai dari awal.</p>
-            <button class="btn-secondary" style="width:100%; color:var(--rs-expense); border-color:rgba(255,59,48,0.3); font-weight:600; height:44px;" onclick="handleResetData()">
-              🗑️ Reset Seluruh Data Transaksi
+            <button class="btn-secondary" style="width:100%; color:var(--rs-expense); border-color:rgba(255,59,48,0.3); font-weight:600; height:44px; display:flex; align-items:center; justify-content:center; gap:6px;" onclick="handleResetData()">
+              <i data-lucide="trash-2" style="width:16px; height:16px;"></i> Reset Seluruh Data Transaksi
             </button>
           </div>
         `;
       } else {
-        avatarBtnText.innerHTML = `👤 Masuk`;
+        avatarBtnText.innerHTML = `<i data-lucide="user" style="width:14px; height:14px;"></i> <span>Masuk</span>`;
         container.innerHTML = `
           <form onsubmit="handleLogin(event)">
             <div class="form-group">
@@ -1494,8 +1498,8 @@
 
           <div style="border-top:var(--rs-border); margin-top:20px; padding-top:16px;">
             <label class="form-label" style="color:var(--rs-expense); font-weight:600;">Reset Data</label>
-            <button class="btn-secondary" style="width:100%; color:var(--rs-expense); border-color:rgba(255,59,48,0.3); font-weight:600; height:44px; margin-top:8px;" onclick="handleResetData()">
-              🗑️ Reset Seluruh Data Transaksi
+            <button class="btn-secondary" style="width:100%; color:var(--rs-expense); border-color:rgba(255,59,48,0.3); font-weight:600; height:44px; margin-top:8px; display:flex; align-items:center; justify-content:center; gap:6px;" onclick="handleResetData()">
+              <i data-lucide="trash-2" style="width:16px; height:16px;"></i> Reset Seluruh Data Transaksi
             </button>
           </div>
         `;
