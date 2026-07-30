@@ -1736,12 +1736,12 @@
       if (!container) return;
 
       const emotionStats = {
-        Stres: { count: 0, total: 0, color: 'var(--rs-red)', emoji: '🔴' },
-        Bosan: { count: 0, total: 0, color: 'var(--rs-gray)', emoji: '⚪' },
-        Senang: { count: 0, total: 0, color: 'var(--rs-amber)', emoji: '🟡' },
-        Puas: { count: 0, total: 0, color: 'var(--rs-income)', emoji: '🟢' },
-        Cemas: { count: 0, total: 0, color: 'var(--rs-orange)', emoji: '🟠' },
-        Sedih: { count: 0, total: 0, color: 'var(--rs-blue, #007AFF)', emoji: '🔵' }
+        Stres: { count: 0, total: 0, color: 'var(--rs-red)', dotClass: 'stres' },
+        Bosan: { count: 0, total: 0, color: 'var(--rs-gray)', dotClass: 'bosan' },
+        Senang: { count: 0, total: 0, color: 'var(--rs-amber)', dotClass: 'senang' },
+        Puas: { count: 0, total: 0, color: 'var(--rs-income)', dotClass: 'puas' },
+        Cemas: { count: 0, total: 0, color: 'var(--rs-orange)', dotClass: 'cemas' },
+        Sedih: { count: 0, total: 0, color: 'var(--rs-blue, #007AFF)', dotClass: 'sedih' }
       };
 
       let totalEmotionTx = 0;
@@ -1769,8 +1769,8 @@
           const pct = totalEmotionAmount > 0 ? Math.round((e.total / totalEmotionAmount) * 100) : 0;
           return `
             <div class="bar-item" style="margin-bottom:12px;">
-              <div class="bar-label" style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;">
-                <span>${e.emoji} ${e.name} (${e.count} tx)</span>
+              <div class="bar-label" style="display:flex; justify-content:space-between; align-items:center; font-size:13px; margin-bottom:4px;">
+                <span style="display:flex; align-items:center; gap:6px;"><span class="rs-emotion-dot ${e.dotClass}"></span> ${e.name} (${e.count} tx)</span>
                 <span class="rs-tabular-nums" style="font-weight:600;">Rp ${e.total.toLocaleString('id-ID')} (${pct}%)</span>
               </div>
               <div class="bar-track" style="height:8px; background:var(--rs-bg-tertiary); border-radius:4px; overflow:hidden;">
