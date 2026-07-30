@@ -50,11 +50,11 @@
   --rs-text-secondary: var(--rs-color-charcoal-600);
   --rs-text-tertiary: var(--rs-color-charcoal-400);
 
-  /* Financial Semantics (Ultra-Minimalist & Distinct) */
+  /* Financial Semantics (Harmonious Gem Tone Palette) */
   --rs-income: #059669;
   --rs-expense: #E11D48;
-  --rs-transfer: #64748B;
-  --rs-warning: #78716C;
+  --rs-transfer: #2563EB;
+  --rs-warning: #D97706;
   --rs-accent: var(--rs-color-charcoal-900);
 
   /* Emotion Spectrum (Attractive Tailored Hues) */
