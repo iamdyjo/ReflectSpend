@@ -1161,6 +1161,7 @@
         localStorage.setItem('rs_reflection_answers', JSON.stringify(reflectionAnswers));
         localStorage.setItem('rs_reflection_submitted', JSON.stringify(true));
         renderReflectionCard();
+        syncReflectionToGoogleSheets(reflectionAnswers);
         alert('Refleksi Mingguan tersimpan!');
       }
     }
@@ -1252,7 +1253,8 @@
 
     // Sync to Google Sheets via Apps Script Web App Endpoint
     async function syncToGoogleSheets(txData) {
-      if (!GOOGLE_SCRIPT_URL) return;
+      const scriptUrl = localStorage.getItem('rs_google_script_url') || GOOGLE_SCRIPT_URL;
+      if (!scriptUrl) return;
 
       if (!navigator.onLine) {
         queueOfflineTransaction(txData);
@@ -1260,7 +1262,7 @@
       }
 
       try {
-        await fetch(GOOGLE_SCRIPT_URL, {
+        await fetch(scriptUrl, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
@@ -1273,6 +1275,32 @@
       } catch (err) {
         console.warn('Sync to Google Sheets offline / error, queueing for background sync:', err);
         queueOfflineTransaction(txData);
+      }
+    }
+
+    async function syncReflectionToGoogleSheets(answers) {
+      const scriptUrl = localStorage.getItem('rs_google_script_url') || GOOGLE_SCRIPT_URL;
+      if (!scriptUrl) return;
+
+      try {
+        await fetch(scriptUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'add_reflection',
+            week: '2026-W30',
+            q1: answers[0] || '',
+            q2: answers[1] || '',
+            q3: answers[2] || '',
+            q4: answers[3] || '',
+            q5: answers[4] || '',
+            q6: answers[5] || ''
+          })
+        });
+        console.log('Weekly reflection synced to Google Sheets!');
+      } catch (err) {
+        console.warn('Reflection sync error:', err);
       }
     }
 
@@ -1443,6 +1471,8 @@
       const avatarBtnText = document.getElementById('user-avatar-text');
       if (!container || !avatarBtnText) return;
       
+      const savedScriptUrl = localStorage.getItem('rs_google_script_url') || '';
+      
       const themeControlHtml = `
         <div class="form-group" style="margin-top:20px;">
           <label class="form-label" style="font-weight:600;">Tema Tampilan</label>
@@ -1450,6 +1480,17 @@
             <button type="button" class="segment-btn ${currentTheme === 'light' ? 'active' : ''}" onclick="setAppTheme('light')"><i data-lucide="sun" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i>Terang</button>
             <button type="button" class="segment-btn ${currentTheme === 'dark' ? 'active' : ''}" onclick="setAppTheme('dark')"><i data-lucide="moon" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i>Gelap</button>
           </div>
+        </div>
+      `;
+
+      const googleSheetsControlHtml = `
+        <div class="form-group" style="margin-top:20px; border-top:var(--rs-border); padding-top:16px;">
+          <label class="form-label" style="font-weight:600; display:flex; align-items:center; gap:6px;">
+            <i data-lucide="file-spreadsheet" style="width:16px; height:16px; color:var(--rs-income);"></i> Integrasi Google Sheets (Web App URL)
+          </label>
+          <p style="font-size:12px; color:var(--rs-text-secondary); margin-bottom:8px;">Tempel Web App URL Google Apps Script milikmu untuk otomatisasi simpan ke Cloud Google Sheets.</p>
+          <input type="url" id="input-google-script-url" class="form-control" placeholder="https://script.google.com/macros/s/.../exec" value="${savedScriptUrl}" style="font-size:13px;">
+          <button type="button" class="btn-secondary" style="width:100%; margin-top:8px; font-size:13px; height:38px;" onclick="saveGoogleScriptUrl()">Simpan URL Google Sheets</button>
         </div>
       `;
 
@@ -1470,6 +1511,7 @@
           </div>
 
           ${themeControlHtml}
+          ${googleSheetsControlHtml}
 
           <div class="form-group" style="margin-top:20px; border-top:var(--rs-border); padding-top:16px;">
             <label class="form-label" style="color:var(--rs-expense); font-weight:600;">Area Bahaya (Data)</label>
@@ -1495,6 +1537,7 @@
           </form>
 
           ${themeControlHtml}
+          ${googleSheetsControlHtml}
 
           <div style="border-top:var(--rs-border); margin-top:20px; padding-top:16px;">
             <label class="form-label" style="color:var(--rs-expense); font-weight:600;">Reset Data</label>
@@ -1505,6 +1548,14 @@
         `;
       }
       lucide.createIcons();
+    }
+
+    function saveGoogleScriptUrl() {
+      const inputEl = document.getElementById('input-google-script-url');
+      if (!inputEl) return;
+      const url = inputEl.value.trim();
+      localStorage.setItem('rs_google_script_url', url);
+      alert('URL Google Sheets Apps Script berhasil disimpan!');
     }
 
     function handleLogin(e) {
