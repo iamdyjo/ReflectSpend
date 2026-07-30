@@ -740,6 +740,115 @@
       border-radius: 4px;
       transition: width 0.4s ease;
     }
+
+    /* Full-Screen PIN Lock Overlay */
+    .pin-lock-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--rs-bg-primary);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .pin-lock-box {
+      width: 100%;
+      max-width: 320px;
+      text-align: center;
+    }
+
+    .pin-lock-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: var(--rs-bg-secondary);
+      border: var(--rs-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px auto;
+      color: var(--rs-text-primary);
+    }
+
+    .pin-lock-title {
+      font-family: var(--rs-font-editorial);
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+      color: var(--rs-text-primary);
+    }
+
+    .pin-lock-subtext {
+      font-size: 13px;
+      color: var(--rs-text-secondary);
+      margin-bottom: 24px;
+    }
+
+    .pin-dots-grid {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .pin-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1.5px solid var(--rs-border-focus);
+      background-color: transparent;
+      transition: background-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .pin-dot.filled {
+      background-color: var(--rs-btn-primary-bg);
+      transform: scale(1.1);
+    }
+
+    .pin-keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      width: 100%;
+    }
+
+    .pin-key-btn {
+      height: 60px;
+      border-radius: 50%;
+      border: var(--rs-border);
+      background-color: var(--rs-bg-secondary);
+      color: var(--rs-text-primary);
+      font-family: var(--rs-font-mono);
+      font-size: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.12s ease, transform 0.08s ease;
+    }
+
+    .pin-key-btn:active {
+      transform: scale(0.92);
+      background-color: var(--rs-bg-tertiary);
+    }
+
+    .pin-key-btn.clear,
+    .pin-key-btn.back {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--rs-text-secondary);
+      border: none;
+      background: none;
+    }
   </style>
 </head>
 <body>
@@ -959,6 +1068,35 @@
         <div id="profile-content" style="padding-top:4px;">
           <!-- Dynamic Profile JS Content -->
         </div>
+    <!-- Full Screen PIN Lock Overlay -->
+    <div id="pin-lock-screen" class="pin-lock-overlay" style="display:none;">
+      <div class="pin-lock-box">
+        <div class="pin-lock-icon"><i data-lucide="lock" style="width:24px; height:24px;"></i></div>
+        <h3 class="pin-lock-title">ReflectSpend Terkunci</h3>
+        <p class="pin-lock-subtext">Masukkan 4-angka PIN untuk membuka</p>
+
+        <div class="pin-dots-grid">
+          <span class="pin-dot" id="pin-dot-1"></span>
+          <span class="pin-dot" id="pin-dot-2"></span>
+          <span class="pin-dot" id="pin-dot-3"></span>
+          <span class="pin-dot" id="pin-dot-4"></span>
+        </div>
+
+        <div class="pin-keypad-grid">
+          <button type="button" class="pin-key-btn" onclick="pressPinKey('1')">1</button>
+          <button type="button" class="pin-key-btn" onclick="pressPinKey('2')">2</button>
+          <button type="button" class="pin-key-btn" onclick="pressPinKey('3')">3</button>
+          <button type="button" class="pin-key-btn" onclick="pressPinKey('4')">4</button>
+          <button type="button" class="pin-key-btn" onclick="pressPinKey('5')">5</button>
+          <button type="button" class="pin-key-btn" onclick="pressPinKey('6')">6</button>
+          <button type="button" class="pin-key-btn" onclick="pressPinKey('7')">7</button>
+          <button type="button" class="pin-key-btn" onclick="pressPinKey('8')">8</button>
+          <button type="button" class="pin-key-btn" onclick="pressPinKey('9')">9</button>
+          <button type="button" class="pin-key-btn clear" onclick="clearPinInput()">Batal</button>
+          <button type="button" class="pin-key-btn" onclick="pressPinKey('0')">0</button>
+          <button type="button" class="pin-key-btn back" onclick="backspacePinKey()">⌫</button>
+        </div>
+        <div id="pin-error-msg" style="color:var(--rs-expense); font-size:13px; margin-top:16px; height:20px; font-weight:600;"></div>
       </div>
     </div>
 
@@ -1662,7 +1800,9 @@
       document.body.removeChild(link);
     }
 
-    // App Lock (PIN Security via crypto.subtle)
+    // App Lock (PIN Security via crypto.subtle & Keypad Overlay)
+    let enteredPinDigits = [];
+
     async function hashPin(pin) {
       const msgUint8 = new TextEncoder().encode(pin);
       const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
@@ -1670,14 +1810,89 @@
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
+    function updatePinDotsUI() {
+      for (let i = 1; i <= 4; i++) {
+        const dot = document.getElementById(`pin-dot-${i}`);
+        if (dot) {
+          dot.classList.toggle('filled', i <= enteredPinDigits.length);
+        }
+      }
+    }
+
+    function pressPinKey(digit) {
+      if (enteredPinDigits.length < 4) {
+        enteredPinDigits.push(digit);
+        updatePinDotsUI();
+        const errEl = document.getElementById('pin-error-msg');
+        if (errEl) errEl.innerText = '';
+
+        if (enteredPinDigits.length === 4) {
+          setTimeout(verifyEnteredPin, 120);
+        }
+      }
+    }
+
+    function backspacePinKey() {
+      if (enteredPinDigits.length > 0) {
+        enteredPinDigits.pop();
+        updatePinDotsUI();
+        const errEl = document.getElementById('pin-error-msg');
+        if (errEl) errEl.innerText = '';
+      }
+    }
+
+    function clearPinInput() {
+      enteredPinDigits = [];
+      updatePinDotsUI();
+      const errEl = document.getElementById('pin-error-msg');
+      if (errEl) errEl.innerText = '';
+    }
+
+    async function verifyEnteredPin() {
+      const pinStr = enteredPinDigits.join('');
+      const hashedInput = await hashPin(pinStr);
+      const savedPinHash = localStorage.getItem('rs_pin_hash');
+
+      if (hashedInput === savedPinHash) {
+        sessionStorage.setItem('rs_pin_unlocked', 'true');
+        const lockScreen = document.getElementById('pin-lock-screen');
+        if (lockScreen) lockScreen.style.display = 'none';
+        clearPinInput();
+      } else {
+        const errEl = document.getElementById('pin-error-msg');
+        if (errEl) errEl.innerText = 'PIN Salah! Coba lagi.';
+        clearPinInput();
+      }
+    }
+
+    function checkAppPinLock() {
+      const savedPinHash = localStorage.getItem('rs_pin_hash');
+      const isUnlockedInSession = sessionStorage.getItem('rs_pin_unlocked') === 'true';
+      const lockScreen = document.getElementById('pin-lock-screen');
+
+      if (savedPinHash && !isUnlockedInSession && lockScreen) {
+        lockScreen.style.display = 'flex';
+        clearPinInput();
+        lucide.createIcons();
+      } else if (lockScreen) {
+        lockScreen.style.display = 'none';
+      }
+    }
+
     async function setAppPin() {
-      const pin = prompt('Masukkan 4-angka PIN rahasia untuk mengunci aplikasi:');
-      if (!pin || pin.length !== 4 || isNaN(pin)) {
+      const pin1 = prompt('Masukkan 4-angka PIN rahasia baru:');
+      if (!pin1 || pin1.length !== 4 || isNaN(pin1)) {
         alert('PIN harus berupa 4 angka numerik.');
         return;
       }
-      const hashed = await hashPin(pin);
+      const pin2 = prompt('Konfirmasi 4-angka PIN rahasia Anda:');
+      if (pin1 !== pin2) {
+        alert('Konfirmasi PIN tidak cocok!');
+        return;
+      }
+      const hashed = await hashPin(pin1);
       localStorage.setItem('rs_pin_hash', hashed);
+      sessionStorage.setItem('rs_pin_unlocked', 'true');
       renderProfileContent();
       alert('Kunci PIN 4-Angka berhasil diaktifkan!');
     }
@@ -1685,6 +1900,7 @@
     function disableAppPin() {
       if (confirm('Apakah kamu yakin ingin menghapus proteksi PIN?')) {
         localStorage.removeItem('rs_pin_hash');
+        sessionStorage.removeItem('rs_pin_unlocked');
         renderProfileContent();
         alert('Proteksi PIN telah dinonaktifkan.');
       }
@@ -2016,8 +2232,9 @@
       lucide.createIcons();
     }
 
-    // Initial Profile Setup on Load
+    // Initial Profile Setup & App Lock Check on Load
     renderProfileContent();
+    checkAppPinLock();
 
     // Register Service Worker for PWA Offline Support & Background Sync
     if ('serviceWorker' in navigator) {
