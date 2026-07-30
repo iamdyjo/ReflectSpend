@@ -1,12 +1,12 @@
 <div align="center">
 
   <h1>💳 ReflectSpend</h1>
-  <p><strong>Pencatatan Keuangan Mindful & Analisis Pemicu Emosional</strong></p>
+  <p><strong>Pencatatan Keuangan Mindful & Analisis Pemicu Emosional Perilaku</strong></p>
 
   <p>
     <a href="https://iamdyjo.github.io/ReflectSpend/"><img src="https://img.shields.io/badge/Live_Demo-GitHub_Pages-007AFF?style=for-the-badge&logo=github" alt="Live Demo"></a>
-    <a href="manifest.json"><img src="https://img.shields.io/badge/PWA-100%25_Free-34C759?style=for-the-badge&logo=pwa" alt="PWA Support"></a>
-    <a href="docs/DESIGN_SYSTEM.md"><img src="https://img.shields.io/badge/Design_System-Apple_HIG_%2B_Notion-1A1A1A?style=for-the-badge" alt="Design System"></a>
+    <a href="manifest.json"><img src="https://img.shields.io/badge/PWA-100%25_Offline_First-34C759?style=for-the-badge&logo=pwa" alt="PWA Support"></a>
+    <a href="docs/DESIGN_SYSTEM.md"><img src="https://img.shields.io/badge/Design_System-Geist_Sans_%2B_Mono-18181B?style=for-the-badge" alt="Design System"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-FF9500?style=for-the-badge" alt="License"></a>
   </p>
 
@@ -15,35 +15,48 @@
   <br />
 
   <a href="https://iamdyjo.github.io/ReflectSpend/">
-    <img src="https://raw.githubusercontent.com/iamdyjo/ReflectSpend/main/uiux/reflectspend-preview.png" alt="ReflectSpend Interface Preview" width="600" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.12);" onerror="this.style.display='none'" />
+    <img src="assets/reflectspend-ui-preview.png" alt="ReflectSpend Interface Preview" width="700" style="border-radius: 14px; border: 1px solid #E4E4E7; box-shadow: 0 12px 40px rgba(0,0,0,0.08);" />
   </a>
+
 </div>
 
 ---
 
 ## 🌟 Mengapa ReflectSpend?
 
-Sebagian besar masalah pengeluaran impulsif **bukan disebabkan oleh kurangnya data nominal**, melainkan **kurangnya kesadaran emosional (mindfulness)**. ReflectSpend hadir untuk menghubungkan setiap Rupiah yang kamu belanjakan dengan kondisi emosional dan intensionalitas di baliknya.
-
-### ✨ Fitur Utama (MVP v1.0)
-
-* 🏠 **Beranda Interaktif**: Summary card `C1`, dual stat grid (saldo & % impulsif), insight naratif otomatis, dan transaksi terbaru.
-* 📋 **Riwayat & 10 Filter Chips**: Pencarian real-time + 6 spektrum emosi (`🔴 Stres`, `⚪ Bosan`, `🟡 Senang`, `🟢 Puas`, `🟠 Cemas`, `🟣 Sedih`) + `⚡ Impulsif` + `💸 Pengeluaran` + `💰 Pemasukan`.
-* 📊 **Analisis Pola Emosi**: Horizontal color-coded bar chart + indikator kepresisian threshold metrik (≥15 transaksi).
-* 📖 **Kartu Refleksi Mingguan (Card Stepper)**: Evaluasi 6 pertanyaan mingguan interaktif dengan progress bar & kartu rangkuman arsip.
-* ➕ **Modal Form Transaksi**: Segmented control jenis, form nominal `tabular-nums`, choice chips emosi, slider skala intensitas (1–10), dan toggle intensionalitas (Direncanakan vs Impulsif).
-* 📱 **PWA & Hybrid Data (100% Gratis)**: Berjalan sebagai aplikasi seluler di HP (iOS & Android) tanpa biaya langganan, tersinkronisasi ke **Google Sheets** via Google Apps Script API dengan *fallback* instan ke browser `localStorage`.
+Sebagian besar masalah pengeluaran impulsif **bukan disebabkan oleh kurangnya data nominal**, melainkan **kurangnya kesadaran emosional (mindfulness)**. ReflectSpend hadir sebagai aplikasi *Local-First PWA* yang menghubungkan setiap Rupiah yang kamu belanjakan dengan kondisi emosional dan intensionalitas di baliknya.
 
 ---
 
-## 🎨 Filosofi Desain (Apple HIG + Notion Aesthetic)
+## ✨ Fitur-Fitur Unggulan
 
-ReflectSpend dibangun menggunakan sistem **Design Tokens 3-Layer** yang didokumentasikan di **[docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)**:
+### 🧠 Psikologi Perilaku & Analisis Intentionality
+* 📈 **Skor Indeks Intentionality (0–100)**: Mengalkulasi kesehatan keputusan finansial secara *real-time* berdasarkan alokasi terencana vs impulsif serta beban emosi negatif.
+* 💸 **Dana Impulsif (Impulsive Loss Amount)**: Menampilkan total nominal Rupiah yang terbuang untuk transaksi tidak direncanakan di Stat Grid Dashboard.
+* 🧘 **Mindful Cooldown Interceptor**: Mengintersepsi transaksi impulsif nominal tinggi (> Rp 100.000) dengan pesan refleksi yang hangat dan *non-judgmental* sebelum menyimpan data.
+* 📊 **Matriks Value-at-Risk Emosi**: Grafik distribusi total pengeluaran per spektrum emosi lengkap dengan persentase dan rekomendasi koping psikologi personal.
 
-1. **Non-Judgmental Red (`#FF3B30`)**: Warna merah **hanya** dipakai pada nominal pengeluaran & tombol hapus — tidak pernah digunakan pada kartu alarm atau pesan scolding (*"Boros!"*).
-2. **Tabular Numerals (`.rs-tabular-nums`)**: Format angka menggunakan `font-variant-numeric: tabular-nums` agar seluruh digit aligned secara vertikal.
-3. **0-Shadow / Flat Borders**: Mengadopsi estetika Notion (background `#F7F7F5`, kartu `#FFFFFF`, border halus 1px `#E5E5E3`).
-4. **Aksesibilitas (WCAG AA Compliant)**: Memenuhi kontras rasio minimal 4.5:1, `aria-label`, peran ARIA tab navigation, dan outline fokus keyboard `:focus-visible`.
+### 🛡️ Keamanan & Kedaulatan Data
+* 🔒 **Full-Screen PIN Keypad Overlay Security**: Proteksi akses aplikasi dengan 4-angka PIN berbasis enkripsi hashing `SHA-256` via Web Crypto API (`crypto.subtle`) tanpa library eksternal.
+* 💾 **1-Click Export CSV & JSON**: Pencadangan data mandiri ke file `.csv` atau `.json` lokal dalam 1 klik tanpa *vendor lock-in*.
+* ☁️ **Hybrid Local-First + Google Sheets Cloud Sync**: Aplikasi bekerja 100% offline via Service Worker PWA, dan otomatis mensinkronkan data ke **Google Sheets** pribadi Anda via Web App API saat terhubung ke internet.
+
+### 🎨 Design System & Estetika Antarmuka
+* 🔤 **Geist Sans & Geist Mono**: Menggunakan font **Geist Sans** yang ramah & menenangkan (bebas kesan kaku/menekan) dan **Geist Mono** (`.rs-tabular-nums`) untuk seluruh digit angka agar sejajar vertikal.
+* 💎 **Harmonious Gem-Tone Palette**: Warna semantik presisi — Emerald Mint (`#059669`), Rose Crimson (`#E11D48`), Sapphire Blue (`#2563EB`), dan Sun Gold Amber (`#D97706`).
+* 🚫 **0 Raw Emoji**: Seluruh ikon menggunakan vektor SVG Lucide yang bersih & konsisten.
+
+---
+
+## 📐 Arsitektur Design System 3-Layer
+
+![ReflectSpend Design System Board](assets/design-system-preview.png)
+
+ReflectSpend disusun menggunakan sistem **Design Tokens 3-Layer** yang didokumentasikan lengkap di **[docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)**:
+
+1. **Primitive Tokens**: Nilai mentah HSL/Hex warna netral hangat (`#FAFAFA` / `#18181B`), tag pastel Notion, serta font scale Geist.
+2. **Semantic Tokens**: Alias visual untuk tema Terang vs Gelap, status keuangan (*Income*, *Expense*, *Transfer*, *Warning*), serta 6 warna emosi.
+3. **Component Tokens**: Spesifikasi variabel khusus komponen (Summary Card, Bento Grid, Floating Action Button, Bottom Navigation Bar, Modal Sheet, Chip Badge, dan PIN Keypad).
 
 ---
 
@@ -51,9 +64,11 @@ ReflectSpend dibangun menggunakan sistem **Design Tokens 3-Layer** yang didokume
 
 ```gfm
 ReflectSpend/
-├── index.html                  # Core PWA Web Application
+├── index.html                  # Core Single Page App (PWA)
 ├── assets/
-│   └── design-tokens.css       # Production CSS Custom Properties & Design Tokens
+│   ├── design-tokens.css       # Production CSS Variable & Design Tokens
+│   ├── reflectspend-ui-preview.png  # Preview Antarmuka UI Mobile
+│   └── design-system-preview.png # Preview Board Design System
 ├── backend/
 │   └── Code.gs                 # Google Apps Script Web App API (Google Sheets Sync)
 ├── database/                   # Master Data CSV Templates untuk Google Sheets
@@ -64,13 +79,12 @@ ReflectSpend/
 │   ├── 5_Emotions.csv
 │   ├── 6_Payment_Methods.csv
 │   └── 7_Triggers.csv
-├── docs/                       # Spesifikasi Lengkap & Panduan
-│   ├── DESIGN_SYSTEM.md        # Token 3-Layer & Spesifikasi UI Komponen C1–C6
-│   ├── GOOGLE_SHEETS_SETUP.md  # Panduan Setup 5 Menit Google Sheets
-│   └── GLIDE_AND_BACKEND_INTEGRATION.md # Panduan Deployment Web App API & Glide
-├── ReflectSpend_PRD.md         # Document PRD ReflectSpend v1.0
+├── docs/                       # Dokumentasi Lengkap
+│   ├── DESIGN_SYSTEM.md        # Arsitektur Token 3-Layer & Spesifikasi UI
+│   ├── GOOGLE_SHEETS_SETUP.md  # Panduan Setup Google Sheets API
+│   └── GLIDE_AND_BACKEND_INTEGRATION.md # Panduan Deployment API & Glide
 ├── manifest.json               # Web App Manifest (PWA)
-└── sw.js                       # Service Worker (Offline Support)
+└── sw.js                       # Service Worker (Offline Support & Background Sync)
 ```
 
 ---
@@ -78,7 +92,6 @@ ReflectSpend/
 ## 🚀 Cara Menjalankan Aplikasi (Quick Start)
 
 ### 🌐 Opsi 1: Buka Langsung Live Demo (100% Gratis)
-Aplikasi sudah ter-deploy dan dapat diakses langsung via browser maupun HP Anda:
 👉 **[https://iamdyjo.github.io/ReflectSpend/](https://iamdyjo.github.io/ReflectSpend/)**
 
 **Cara Pasang di HP (PWA):**
@@ -87,31 +100,16 @@ Aplikasi sudah ter-deploy dan dapat diakses langsung via browser maupun HP Anda:
 
 ---
 
-### 💻 Opsi 2: Menjalankan Secara Lokal di Komputer
-1. Clone repositori ini:
-   ```bash
-   git clone https://github.com/iamdyjo/ReflectSpend.git
-   cd ReflectSpend
-   ```
-2. Buka berkas `index.html` di browser Anda (klik 2x atau gunakan server lokal `npx serve .`).
+### 💻 Opsi 2: Jalankan Lokal di Komputer
+```bash
+git clone https://github.com/iamdyjo/ReflectSpend.git
+cd ReflectSpend
+# Buka index.html di browser atau jalankan server lokal:
+npx serve .
+```
 
 ---
 
-### 📊 Opsi 3: Hubungkan ke Database Google Sheets Pribadi
-1. Ikuti panduan di **[docs/GOOGLE_SHEETS_SETUP.md](docs/GOOGLE_SHEETS_SETUP.md)** untuk mengimpor berkas CSV di folder `database/` ke Google Sheets Anda.
-2. Pasang skrip **[backend/Code.gs](backend/Code.gs)** di Google Sheets (*Extensions -> Apps Script*) dan deploy sebagai *Web App*.
-3. Tempelkan URL Web App ke variabel `GOOGLE_SCRIPT_URL` pada `index.html`.
+## 📜 Lisensi
 
----
-
-## 🛠️ Agen Skills & Perkakas Pengembangan
-
-Repositori ini dikembangkan dan diaudit menggunakan suite agen kustom di `.agents/`:
-* **Ponytail Skill Suite**: Senior dev mode (`ponytail`, `ponytail-review`, `ponytail-audit`, `ponytail-debt`, `ponytail-gain`, `ponytail-help`).
-* **UI/UX Pro Max Suite**: Design auditor & design system builder (`design-auditor`, `ui-ux-pro-max`, `banner-design`, `brand`, `design`, `design-system`, `slides`, `ui-styling`).
-
----
-
-## 📄 Lisensi
-
-Proyek ini dirilis di bawah lisensi [MIT License](LICENSE). Bebas digunakan, dimodifikasi, dan dikembangkan untuk keperluan personal maupun komersial.
+Proyek ini dirilis di bawah lisensi **MIT License**.
