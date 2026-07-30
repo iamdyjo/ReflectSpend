@@ -782,6 +782,10 @@
           <div class="stat-label">Transaksi Impulsif</div>
           <div class="stat-value rs-tabular-nums" id="dashboard-impulsive-stat" style="color:var(--rs-warning)">0% (0 tx)</div>
         </div>
+        <div class="stat-card">
+          <div class="stat-label">Dana Impulsif</div>
+          <div class="stat-value rs-tabular-nums" id="dashboard-impulsive-loss" style="color:var(--rs-expense)">Rp 0</div>
+        </div>
       </div>
 
       <!-- Dynamic AI Insight Card (C6) -->
@@ -1401,7 +1405,26 @@
     // Save Handler
     async function handleSaveTx(e) {
       e.preventDefault();
-      const nominal = parseInt(document.getElementById('tx-nominal').value);
+      const nominalInput = document.getElementById('tx-nominal');
+      const nominal = parseInt(nominalInput ? nominalInput.value : 0);
+      
+      if (isNaN(nominal) || nominal <= 0) {
+        alert('Silakan masukkan nominal transaksi yang valid (lebih besar dari 0).');
+        if (nominalInput) nominalInput.focus();
+        return;
+      }
+
+      // Mindful Cooldown Interceptor for unplanned high-value purchases
+      if (currentJenis === 'Pengeluaran' && !isPlanned && nominal >= 100000) {
+        const confirmSave = confirm(
+          `🧘 JEDA REFLEKSI MINDFUL\n\n` +
+          `Kamu akan mencatat pengeluaran impulsif sebesar Rp ${nominal.toLocaleString('id-ID')}.\n\n` +
+          `Tarik napas dalam-dalam... Apakah pembelian ini memenuhi kebutuhan sejati atau sekadar mengobati emosi sesaat (${selectedEmosi})?\n\n` +
+          `Klik OK jika tetap ingin menyimpan, atau Cancel untuk memikirkannya kembali.`
+        );
+        if (!confirmSave) return;
+      }
+
       const kategori = document.getElementById('tx-kategori').value;
 
       const catList = categoryMap[currentJenis] || [];
@@ -1466,13 +1489,15 @@
       document.getElementById('profile-modal').classList.remove('active');
     }
 
-    function renderProfileContent() {
-      const container = document.getElementById('profile-content');
-      const avatarBtnText = document.getElementById('user-avatar-text');
-      if (!container || !avatarBtnText) return;
+      const hasPin = !!localStorage.getItem('rs_pin_hash');
+      const pendingQueueCount = getPendingQueue().length;
       
-      const savedScriptUrl = localStorage.getItem('rs_google_script_url') || '';
-      
+      const syncPillHtml = savedScriptUrl ? 
+        `<span style="font-family:var(--rs-font-mono); font-size:11px; font-weight:600; color:var(--rs-income); background:var(--rs-pastel-green-bg); padding:3px 10px; border-radius:9999px; border:1px solid rgba(52,199,89,0.2); display:inline-flex; align-items:center; gap:4px;"><i data-lucide="cloud-check" style="width:13px; height:13px;"></i> Cloud Sync Aktif</span>` :
+        (pendingQueueCount > 0 ? 
+          `<span style="font-family:var(--rs-font-mono); font-size:11px; font-weight:600; color:var(--rs-warning); background:var(--rs-pastel-yellow-bg); padding:3px 10px; border-radius:9999px; border:1px solid rgba(149,100,0,0.2); display:inline-flex; align-items:center; gap:4px;"><i data-lucide="cloud-off" style="width:13px; height:13px;"></i> ${pendingQueueCount} Antrean Offline</span>` :
+          `<span style="font-family:var(--rs-font-mono); font-size:11px; font-weight:600; color:var(--rs-text-secondary); background:var(--rs-bg-tertiary); padding:3px 10px; border-radius:9999px; border:var(--rs-border); display:inline-flex; align-items:center; gap:4px;"><i data-lucide="hard-drive" style="width:13px; height:13px;"></i> Penyimpanan Lokal</span>`);
+
       const themeControlHtml = `
         <div class="form-group" style="margin-top:20px;">
           <label class="form-label" style="font-weight:600;">Tema Tampilan</label>
@@ -1485,12 +1510,39 @@
 
       const googleSheetsControlHtml = `
         <div class="form-group" style="margin-top:20px; border-top:var(--rs-border); padding-top:16px;">
-          <label class="form-label" style="font-weight:600; display:flex; align-items:center; gap:6px;">
-            <i data-lucide="file-spreadsheet" style="width:16px; height:16px; color:var(--rs-income);"></i> Integrasi Google Sheets (Web App URL)
-          </label>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label class="form-label" style="font-weight:600; display:flex; align-items:center; gap:6px; margin:0;">
+              <i data-lucide="file-spreadsheet" style="width:16px; height:16px; color:var(--rs-income);"></i> Google Sheets Cloud
+            </label>
+            ${syncPillHtml}
+          </div>
           <p style="font-size:12px; color:var(--rs-text-secondary); margin-bottom:8px;">Tempel Web App URL Google Apps Script milikmu untuk otomatisasi simpan ke Cloud Google Sheets.</p>
           <input type="url" id="input-google-script-url" class="form-control" placeholder="https://script.google.com/macros/s/.../exec" value="${savedScriptUrl}" style="font-size:13px;">
           <button type="button" class="btn-secondary" style="width:100%; margin-top:8px; font-size:13px; height:38px;" onclick="saveGoogleScriptUrl()">Simpan URL Google Sheets</button>
+        </div>
+      `;
+
+      const securityAndExportHtml = `
+        <div class="form-group" style="margin-top:20px; border-top:var(--rs-border); padding-top:16px;">
+          <label class="form-label" style="font-weight:600; display:flex; align-items:center; gap:6px;">
+            <i data-lucide="shield" style="width:16px; height:16px; color:var(--rs-text-primary);"></i> Keamanan & PIN Lock
+          </label>
+          <p style="font-size:12px; color:var(--rs-text-secondary); margin-bottom:8px;">Proteksi akses aplikasi dengan 4-angka PIN saat dibuka.</p>
+          ${hasPin ? 
+            `<button type="button" class="btn-secondary" style="width:100%; font-size:13px; height:38px; color:var(--rs-expense);" onclick="disableAppPin()"><i data-lucide="lock" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i>Nonaktifkan PIN</button>` :
+            `<button type="button" class="btn-secondary" style="width:100%; font-size:13px; height:38px;" onclick="setAppPin()"><i data-lucide="key" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i>Aktifkan PIN 4-Angka</button>`
+          }
+        </div>
+
+        <div class="form-group" style="margin-top:20px; border-top:var(--rs-border); padding-top:16px;">
+          <label class="form-label" style="font-weight:600; display:flex; align-items:center; gap:6px;">
+            <i data-lucide="download" style="width:16px; height:16px;"></i> Ekspor Data Mandiri (Backup)
+          </label>
+          <p style="font-size:12px; color:var(--rs-text-secondary); margin-bottom:8px;">Unduh riwayat transaksi dan refleksi ke perangkat lokal.</p>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn-secondary" style="flex:1; font-size:12px; height:38px;" onclick="exportDataCSV()"><i data-lucide="file-text" style="width:13px; height:13px; display:inline-block; vertical-align:middle; margin-right:4px;"></i>Export CSV</button>
+            <button type="button" class="btn-secondary" style="flex:1; font-size:12px; height:38px;" onclick="exportDataJSON()"><i data-lucide="code" style="width:13px; height:13px; display:inline-block; vertical-align:middle; margin-right:4px;"></i>Export JSON</button>
+          </div>
         </div>
       `;
 
@@ -1512,6 +1564,7 @@
 
           ${themeControlHtml}
           ${googleSheetsControlHtml}
+          ${securityAndExportHtml}
 
           <div class="form-group" style="margin-top:20px; border-top:var(--rs-border); padding-top:16px;">
             <label class="form-label" style="color:var(--rs-expense); font-weight:600;">Area Bahaya (Data)</label>
@@ -1538,6 +1591,7 @@
 
           ${themeControlHtml}
           ${googleSheetsControlHtml}
+          ${securityAndExportHtml}
 
           <div style="border-top:var(--rs-border); margin-top:20px; padding-top:16px;">
             <label class="form-label" style="color:var(--rs-expense); font-weight:600;">Reset Data</label>
@@ -1548,6 +1602,86 @@
         `;
       }
       lucide.createIcons();
+    }
+
+    // Export CSV & JSON Data Functions
+    function exportDataCSV() {
+      if (!mockTransactions || mockTransactions.length === 0) {
+        alert('Belum ada transaksi untuk diekspor.');
+        return;
+      }
+      const headers = ['ID', 'Tanggal', 'Jenis', 'Nominal', 'Kategori', 'Emosi', 'Direncanakan'];
+      const rows = mockTransactions.map(tx => [
+        tx.id,
+        `"${tx.tgl || 'Hari ini'}"`,
+        `"${tx.jenis || ''}"`,
+        tx.nominal || 0,
+        `"${tx.kategori || ''}"`,
+        `"${tx.emosi || ''}"`,
+        tx.planned ? 'Ya' : 'Tidak'
+      ]);
+      const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `reflectspend_transactions_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function exportDataJSON() {
+      if (!mockTransactions || mockTransactions.length === 0) {
+        alert('Belum ada transaksi untuk diekspor.');
+        return;
+      }
+      const jsonContent = JSON.stringify({
+        profile: userProfile,
+        transactions: mockTransactions,
+        reflections: {
+          answers: JSON.parse(localStorage.getItem('rs_reflection_answers')) || [],
+          submitted: JSON.parse(localStorage.getItem('rs_reflection_submitted')) || false
+        },
+        exportedAt: new Date().toISOString()
+      }, null, 2);
+
+      const blob = new Blob([jsonContent], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `reflectspend_backup_${new Date().toISOString().split('T')[0]}.json`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // App Lock (PIN Security via crypto.subtle)
+    async function hashPin(pin) {
+      const msgUint8 = new TextEncoder().encode(pin);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function setAppPin() {
+      const pin = prompt('Masukkan 4-angka PIN rahasia untuk mengunci aplikasi:');
+      if (!pin || pin.length !== 4 || isNaN(pin)) {
+        alert('PIN harus berupa 4 angka numerik.');
+        return;
+      }
+      const hashed = await hashPin(pin);
+      localStorage.setItem('rs_pin_hash', hashed);
+      renderProfileContent();
+      alert('Kunci PIN 4-Angka berhasil diaktifkan!');
+    }
+
+    function disableAppPin() {
+      if (confirm('Apakah kamu yakin ingin menghapus proteksi PIN?')) {
+        localStorage.removeItem('rs_pin_hash');
+        renderProfileContent();
+        alert('Proteksi PIN telah dinonaktifkan.');
+      }
     }
 
     function saveGoogleScriptUrl() {
@@ -1606,20 +1740,26 @@
       let totalExpense = 0;
       let totalIncome = 0;
       let impulsiveCount = 0;
+      let impulsiveLossTotal = 0;
       let expenseCount = 0;
 
       mockTransactions.forEach(tx => {
+        const nom = parseInt(tx.nominal) || 0;
         if (tx.jenis === 'Pengeluaran') {
-          totalExpense += parseInt(tx.nominal) || 0;
+          totalExpense += nom;
           expenseCount++;
-          if (!tx.planned) impulsiveCount++;
+          if (!tx.planned) {
+            impulsiveCount++;
+            impulsiveLossTotal += nom;
+          }
         } else if (tx.jenis === 'Pemasukan') {
-          totalIncome += parseInt(tx.nominal) || 0;
+          totalIncome += nom;
         }
       });
 
       const impulsivePct = expenseCount > 0 ? Math.round((impulsiveCount / expenseCount) * 100) : 0;
       const netBalance = totalIncome - totalExpense;
+      const cashFlowRatio = totalIncome > 0 ? Math.round((totalExpense / totalIncome) * 100) : 0;
 
       const expenseEl = document.getElementById('dashboard-total-expense');
       if (expenseEl) expenseEl.innerText = `Rp ${totalExpense.toLocaleString('id-ID')}`;
@@ -1630,8 +1770,11 @@
       const impulsiveEl = document.getElementById('dashboard-impulsive-stat');
       if (impulsiveEl) impulsiveEl.innerText = `${impulsivePct}% (${impulsiveCount} tx)`;
 
+      const impulsiveLossEl = document.getElementById('dashboard-impulsive-loss');
+      if (impulsiveLossEl) impulsiveLossEl.innerText = `Rp ${impulsiveLossTotal.toLocaleString('id-ID')}`;
+
       const subtextEl = document.getElementById('dashboard-expense-subtext');
-      if (subtextEl) subtextEl.innerText = `${expenseCount} pengeluaran terdaftar bulan ini`;
+      if (subtextEl) subtextEl.innerText = `${expenseCount} pengeluaran bulan ini · Rasio Arus Kas: ${cashFlowRatio}% dari Pemasukan`;
 
       updateDashboardAIInsight();
     }
