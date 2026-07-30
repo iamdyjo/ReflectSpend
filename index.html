@@ -741,7 +741,7 @@
       transition: width 0.4s ease;
     }
 
-    /* Full-Screen PIN Lock Overlay */
+    /* Full-Screen PIN Lock Overlay (Geist Minimalist UI) */
     .pin-lock-overlay {
       position: fixed;
       top: 0;
@@ -749,7 +749,7 @@
       right: 0;
       bottom: 0;
       background-color: var(--rs-bg-primary);
-      z-index: 100;
+      z-index: 1000;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -769,7 +769,7 @@
       height: 56px;
       border-radius: 50%;
       background-color: var(--rs-bg-secondary);
-      border: var(--rs-border);
+      border: 1px solid var(--rs-border-default);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -778,15 +778,16 @@
     }
 
     .pin-lock-title {
-      font-family: var(--rs-font-editorial);
-      font-size: 24px;
+      font-family: var(--rs-font-family);
+      font-size: 22px;
       font-weight: 600;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.01em;
       margin-bottom: 6px;
       color: var(--rs-text-primary);
     }
 
     .pin-lock-subtext {
+      font-family: var(--rs-font-mono);
       font-size: 13px;
       color: var(--rs-text-secondary);
       margin-bottom: 24px;
@@ -809,25 +810,29 @@
     }
 
     .pin-dot.filled {
-      background-color: var(--rs-btn-primary-bg);
+      background-color: var(--rs-text-primary);
       transform: scale(1.1);
     }
 
     .pin-keypad-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
+      gap: 16px;
       width: 100%;
+      max-width: 280px;
+      margin: 0 auto;
     }
 
     .pin-key-btn {
-      height: 60px;
+      width: 64px;
+      height: 64px;
+      margin: 0 auto;
       border-radius: 50%;
-      border: var(--rs-border);
+      border: 1px solid var(--rs-border-default);
       background-color: var(--rs-bg-secondary);
       color: var(--rs-text-primary);
       font-family: var(--rs-font-mono);
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 600;
       cursor: pointer;
       display: flex;
@@ -843,11 +848,22 @@
 
     .pin-key-btn.clear,
     .pin-key-btn.back {
+      font-family: var(--rs-font-family);
       font-size: 14px;
       font-weight: 500;
       color: var(--rs-text-secondary);
       border: none;
       background: none;
+    }
+
+    @keyframes pinShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .pin-shake {
+      animation: pinShake 0.3s ease-in-out;
     }
   </style>
 </head>
@@ -1880,6 +1896,11 @@
       } else {
         const errEl = document.getElementById('pin-error-msg');
         if (errEl) errEl.innerText = 'PIN Salah! Coba lagi.';
+        const lockBox = document.querySelector('.pin-lock-box');
+        if (lockBox) {
+          lockBox.classList.add('pin-shake');
+          setTimeout(() => lockBox.classList.remove('pin-shake'), 350);
+        }
         clearPinInput();
       }
     }
